@@ -1,0 +1,31 @@
+<div class="container">
+    @if(fornecedores.length > 0){
+    <div class="row">
+        <h1 class="text-center">Fornecedores Cadastrados</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">#</th>
+                    <th scope="col" class="text-center">Nome</th>
+                    <th scope="col" class="text-center">CNPJ</th>
+                    <th scope="col" class="text-center">Telefone</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(fornecedor of fornecedores; track fornecedor.id){
+                <tr>
+                    <th scope="row" class="text-center">{{ fornecedor.id}}</th>
+                    <td>{{ fornecedor.nome }}</td>
+                    <td>{{ fornecedor.cnpj }}</td>
+                    <td>{{ fornecedor.fone }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }@else {
+    <div class="row">
+        <h1 class="text-center">Nenhum Fornecedor Cadastrado</h1>
+    </div>
+    }
+</div>
