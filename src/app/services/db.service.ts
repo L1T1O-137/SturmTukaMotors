@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { Fornecedor } from '../models/fornecedor.model';
+import { Cliente } from '../models/cliente.model';
 @Injectable({ providedIn: 'root' })
 export class DbService extends Dexie {
-  fornecedores!: Table<Fornecedor, number>;
+  clientes!: Table<Cliente, number>;
   constructor() {
     super('LavaCarDB');
     this.version(1).stores({
-      fornecedores: '++id, nome, cnpj, fone',
+      clientes: '++id, nome, cpf, fone',
     });
   }
 }

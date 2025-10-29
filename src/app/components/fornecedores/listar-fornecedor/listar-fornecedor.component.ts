@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Fornecedor } from '../../../models/fornecedor.model';
-import { FornecedorService } from '../../../services/fornecedor.service';
+import { Cliente } from '../../../models/cliente.model';
+import { ClienteService } from '../../../services/cliente.service';
 import { db } from '../../../services/db.service';
 
 @Component({
@@ -10,23 +10,23 @@ import { db } from '../../../services/db.service';
   styleUrl: './listar-fornecedor.component.css'
 })
 export class ListarFornecedorComponent implements OnInit {
-  fornecedores: Fornecedor[] = []
-  constructor(private fornecedorService: FornecedorService) { }
+  fornecedores: Cliente[] = []
+  constructor(private fornecedorService: ClienteService) { }
   ngOnInit() {
     this.getAllFornecedores();
   }
   getAllFornecedores() {
-    this.fornecedorService.getAllFornecedores().then(fornecedores => {
-      this.fornecedores = fornecedores;
+    this.fornecedorService.getAllClientes().then(cliente => {
+      this.fornecedores = cliente;
     });
   }
   getFornecedorById(id: number) {
-    return db.fornecedores.get(id);
+    return db.clientes.get(id);
     }
-    updateFornecedor(fornecedor: Fornecedor) {
-    return db.fornecedores.put(fornecedor);
+    updateFornecedor(fornecedor: Cliente) {
+    return db.clientes.put(fornecedor);
     }
     deleteFornecedor(id: number) {
-    return db.fornecedores.delete(id);
+    return db.clientes.delete(id);
     }
 }
