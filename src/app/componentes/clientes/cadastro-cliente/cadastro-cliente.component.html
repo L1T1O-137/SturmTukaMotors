@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="col-md-6 offset-md-3">
+        <h1 class="text-center">Cadastrar Cliente</h1>
+        <form [formGroup]="formCliente" (ngSubmit)="addCliente()" class="mb-5">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome do Cliente:</label>
+                <input type="text" class="form-control" id="nome" formControlName="nome" required />
+            </div>
+            <div class="mb-3">
+                <label for="cnpj" class="form-label">CPF:</label>
+                <input type="text" class="form-control" id="cpf" formControlName="cpf" required />
+            </div>
+            <div class="mb-3">
+                <label for="fone" class="form-label">Telefone:</label>
+                <input type="text" class="form-control" id="fone" formControlName="fone" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="reset" class="ms-2 btn btn-danger">Limpar</button>
+        </form>
+    </div>
+</div>
