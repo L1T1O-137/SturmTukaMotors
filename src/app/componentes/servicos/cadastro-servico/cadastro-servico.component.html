@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="col-md-6 offset-md-3">
+    @if(servicoId){
+      <h1 class="text-center">Editar Serviço</h1>
+    }@else {
+      <h1 class="text-center">Cadastrar Serviço</h1>
+    }
+
+    <form [formGroup]="formServico" (ngSubmit)="addServico()" class="mb-5">
+      <div class="mb-3">
+        <label for="nome" class="form-label">Nome do Serviço:</label>
+        <input type="text" class="form-control" id="nome" formControlName="nome"
+               [ngClass]="{
+                 'is-invalid': formServico.get('nome')?.invalid && formServico.get('nome')?.touched,
+                 'is-valid': formServico.get('nome')?.valid && formServico.get('nome')?.touched
+               }" required />
+        @if(formServico.get('nome')?.invalid && formServico.get('nome')?.touched){
+          <div class="form-text text-danger">Nome é obrigatório.</div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="descricao" class="form-label">Descrição:</label>
+        <textarea id="descricao" class="form-control" formControlName="descricao" rows="3"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="preco" class="form-label">Preço:</label>
+        <input type="number" class="form-control" id="preco" formControlName="preco" min="0" step="0.01"
+               [ngClass]="{
+                 'is-invalid': formServico.get('preco')?.invalid && formServico.get('preco')?.touched,
+                 'is-valid': formServico.get('preco')?.valid && formServico.get('preco')?.touched
+               }" required />
+        @if(formServico.get('preco')?.invalid && formServico.get('preco')?.touched){
+          <div class="form-text text-danger">Preço é obrigatório e deve ser maior ou igual a 0.</div>
+        }
+      </div>
+
+      @if(formServico.invalid){
+        <div class="form-text text-danger mb-4">Preencha todos os campos obrigatórios.</div>
+      }@else {
+        <div class="form-text text-success mb-4">Campos obrigatórios preenchidos.</div>
+      }
+
+      <button type="submit" class="btn btn-primary" [disabled]="formServico.invalid">
+        @if(servicoId){ Atualizar }@else { Salvar }
+      </button>
+      <button type="reset" class="ms-2 btn btn-danger" (click)="limpar()">Limpar</button>
+      @if(servicoId){
+        <button type="button" class="ms-2 btn btn-secondary" (click)="cancelEdit.emit()">Cancelar Edição</button>
+      }
+    </form>
+  </div>
+  </div>

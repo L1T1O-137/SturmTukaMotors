@@ -1,1 +1,25 @@
+/* Global layout adjustments */
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding-top: 70px; /* offset fix for fixed header height */
+	background-color: #f8f9fa;
+	font-family: system-ui, Arial, sans-serif;
+}
+
+/* Utility class if you want finer control instead of global padding */
+.with-header {
+	padding-top: 70px;
+}
+
+/* Optional: smooth scrolling for anchored navigation */
+html {
+	scroll-behavior: smooth;
+}
+
+/* Ensure images scale nicely */
+img { max-width: 100%; height: auto; display: block; }
 

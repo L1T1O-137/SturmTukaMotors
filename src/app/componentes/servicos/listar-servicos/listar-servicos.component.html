@@ -1,0 +1,43 @@
+<div class="container">
+  @if(servicos.length > 0){
+  <div class="row col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="text-center flex-grow-1">Serviços Cadastrados</h1>
+      <button class="btn btn-sm btn-success ms-2" (click)="novoServico()"><i class="bi bi-plus-lg me-1"></i>Novo</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="text-center">#</th>
+          <th scope="col" class="text-center">Nome</th>
+          <th scope="col" class="text-center">Descrição</th>
+          <th scope="col" class="text-center">Preço (R$)</th>
+          <th scope="col" class="text-center">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(servico of servicos; track servico.id){
+        <tr>
+          <th scope="row" class="text-center">{{ servico.id }}</th>
+          <td>{{ servico.nome }}</td>
+          <td>{{ servico.descricao }}</td>
+          <td class="text-end">{{ servico.preco | number:'1.2-2' }}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEditar(servico)"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-sm btn-outline-danger me-2" (click)="onDelete(servico)"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="associarProdutos(servico.id!)" [disabled]="!servico.id"><i class="bi bi-arrows-move"></i></button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }@else {
+  <div class="row">
+    <h1 class="text-center">Nenhum Serviço Cadastrado</h1>
+    <div class="d-flex justify-content-center mt-3">
+      <button class="btn btn-success" (click)="novoServico()"><i class="bi bi-plus-lg me-1"></i>Novo Serviço</button>
+    </div>
+  </div>
+  }
+</div>

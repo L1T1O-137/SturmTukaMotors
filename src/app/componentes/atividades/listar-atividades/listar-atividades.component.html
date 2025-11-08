@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="row col-md-12">
+    <h1 class="text-center my-4">Atividades</h1>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Categoria</label>
+        <select class="form-select" (change)="filtroCategoria = $any($event.target).value; applyFilters()">
+          <option value="Todas">Todas</option>
+          <option *ngFor="let c of categorias" [value]="c">{{c}}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Funcionário</label>
+        <select class="form-select" (change)="filtroFuncionarioId = $any($event.target).value; applyFilters()">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let f of funcionarios" [value]="f.id">{{f.nome}} - {{f.funcao}}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Prioridade</label>
+        <select class="form-select" (change)="filtroPrioridade = $any($event.target).value; applyFilters()">
+          <option value="Todas">Todas</option>
+          <option *ngFor="let p of prioridades" [value]="p">{{p}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-block mb-2">
+      <button class="btn btn-primary" type="button" (click)="addAtividade()">Nova Atividade</button>
+    </div>
+
+    @if(filtered.length > 0){
+      <div class="row">
+        @for(a of filtered; track a.id){
+          <div class="col-sm-6 col-md-4 col-lg-3 my-3">
+            <div class="card h-100 shadow-sm" [ngClass]="{'concluida': isConcluida(a)}">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title text-truncate mb-1">{{a.nome}}</h5>
+                  <div class="d-flex gap-1">
+                    <span class="badge text-bg-secondary">{{a.categoria}}</span>
+                    <span class="badge text-bg-success" *ngIf="isConcluida(a)">Concluída</span>
+                  </div>
+                </div>
+                <p class="card-text mb-2 small text-muted">Prioridade: <b>{{a.prioridade}}</b></p>
+                <p class="card-text" style="min-height:3em">{{a.descricao}}</p>
+                <p class="card-text text-muted small mb-1">
+                  <i class="bi bi-calendar-event me-1"></i>Início: {{a.dataInicio | date:'dd/MM/y'}}
+                  <span *ngIf="a.dataFim"> | Fim: {{a.dataFim | date:'dd/MM/y'}}</span>
+                </p>
+                <div class="mt-auto d-flex justify-content-end flex-wrap gap-2">
+                  <button class="btn btn-sm" 
+                          [ngClass]="{'btn-success': !isConcluida(a), 'btn-secondary': isConcluida(a)}"
+                          (click)="!isConcluida(a) && concluirAtividade(a)" 
+                          [disabled]="isProcessing(a)"
+                          [title]="isConcluida(a) ? 'Já concluída' : 'Concluir e dar baixa'">
+                    <span *ngIf="!isConcluida(a) && !isProcessing(a)">Concluir</span>
+                    <span *ngIf="isProcessing(a)">Processando...</span>
+                    <span *ngIf="isConcluida(a) && !isProcessing(a)">Concluída</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-primary" (click)="editAtividade(a.id!)" title="Editar">Editar</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteAtividade(a.id!)" title="Remover">Remover</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="row"><h3 class="text-center">Nenhuma atividade encontrada</h3></div>
+    }
+  </div>
+</div>

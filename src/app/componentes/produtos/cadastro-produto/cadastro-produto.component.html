@@ -1,0 +1,91 @@
+<div class="container">
+  <div class="col-md-6 offset-md-3">
+  <h1 class="text-center">{{ editMode ? 'Editar Produto' : 'Cadastrar Produto' }}</h1>
+    <form [formGroup]="formProduto" (ngSubmit)="addProduto()" class="mb-5">
+      
+      <!-- Nome do Produto -->
+      <div class="mb-3">
+        <label for="nome" class="form-label">Nome do Produto:</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="nome" 
+          formControlName="nome" 
+          [ngClass]="{
+            'is-invalid': formProduto.get('nome')?.invalid && formProduto.get('nome')?.touched,
+            'is-valid': formProduto.get('nome')?.valid && formProduto.get('nome')?.touched
+          }" 
+          required 
+        />
+        @if(formProduto.get('nome')?.invalid && formProduto.get('nome')?.touched){
+          <div class="form-text text-danger">Nome é obrigatório.</div>
+        }
+      </div>
+
+      <!-- Preço -->
+      <div class="mb-3">
+        <label for="preco" class="form-label">Preço:</label>
+        <input 
+          type="number" 
+          step="0.01"
+          class="form-control" 
+          id="preco" 
+          formControlName="preco" 
+          [ngClass]="{
+            'is-invalid': formProduto.get('preco')?.invalid && formProduto.get('preco')?.touched,
+            'is-valid': formProduto.get('preco')?.valid && formProduto.get('preco')?.touched
+          }" 
+          required 
+        />
+        @if(formProduto.get('preco')?.invalid && formProduto.get('preco')?.touched){
+          <div class="form-text text-danger">Preço é obrigatório.</div>
+        }
+      </div>
+
+      <!-- Quantidade -->
+      <div class="mb-3">
+        <label for="quantidade" class="form-label">Quantidade:</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          id="quantidade" 
+          formControlName="quantidade"
+          [ngClass]="{
+            'is-invalid': formProduto.get('quantidade')?.invalid && formProduto.get('quantidade')?.touched,
+            'is-valid': formProduto.get('quantidade')?.valid && formProduto.get('quantidade')?.touched 
+          }" 
+          required 
+        />
+        @if(formProduto.get('quantidade')?.invalid && formProduto.get('quantidade')?.touched){
+          <div class="form-text text-danger">Quantidade é obrigatória.</div>
+        }
+      </div>
+
+      <!-- Fornecedor -->
+      <div class="mb-3">
+        <label for="fornecedorId" class="form-label">Fornecedor:</label>
+        <select 
+          class="form-select" 
+          formControlName="fornecedorId" 
+          id="fornecedorId"
+          aria-label="Fornecedor" 
+          required
+        >
+          <option [value]="null" disabled selected>Selecione um fornecedor</option>
+          @for(fornecedor of fornecedores; track fornecedor.id){
+            <option [value]="fornecedor.id">
+              {{ fornecedor.nome }} - {{ fornecedor.cpf }} - {{ fornecedor.fone }}
+            </option>
+          }
+        </select>
+        <div class="form-text">Selecione o fornecedor para o produto.</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="formProduto.invalid">
+        {{ editMode ? 'Atualizar' : 'Salvar' }}
+      </button>
+      <button type="reset" class="ms-2 btn btn-secondary" *ngIf="!editMode">Limpar</button>
+      <button type="button" class="ms-2 btn btn-warning" *ngIf="editMode" (click)="cancelarEdicao()">Cancelar Edição</button>
+    </form>
+  </div>
+</div>

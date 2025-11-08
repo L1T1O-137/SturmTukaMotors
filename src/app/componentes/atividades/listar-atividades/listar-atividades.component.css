@@ -1,0 +1,5 @@
+.card{position:relative}
+.badge{font-size:0.65rem}
+.btn-secondary[disabled]{opacity:0.8}
+.card.concluida{border:2px solid #198754;}
+.card.concluida .card-title::before{content:'✔ ';color:#198754;font-weight:600;}

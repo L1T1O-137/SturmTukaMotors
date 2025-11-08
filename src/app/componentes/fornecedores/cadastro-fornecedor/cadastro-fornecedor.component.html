@@ -1,21 +1,67 @@
 <div class="container">
     <div class="col-md-6 offset-md-3">
-        <h1 class="text-center">Cadastrar Fornecedor</h1>
+    @if(fornecedorId){
+    <h1 class="text-center">Editar Fornecedor</h1>
+    }@else {
+    <h1 class="text-center">Cadastrar Fornecedor</h1>
+    }
+
         <form [formGroup]="formFornecedor" (ngSubmit)="addFornecedor()" class="mb-5">
             <div class="mb-3">
                 <label for="nome" class="form-label">Nome do Fornecedor:</label>
-                <input type="text" class="form-control" id="nome" formControlName="nome" required />
+                <input type="text" class="form-control" id="nome" formControlName="nome" [ngClass]="{
+                                 'is-invalid': formFornecedor.get('nome')?.invalid && formFornecedor.get('nome')?.touched,
+                                 'is-valid': formFornecedor.get('nome')?.valid && formFornecedor.get('nome')?.touched
+                             }" required />
+                @if(formFornecedor.get('nome')?.pristine){
+                <div class="form-text">* Campo obrigatório.</div>
+                }
+                @if(formFornecedor.get('nome')?.invalid && formFornecedor.get('nome')?.touched){
+                <div class="form-text text-danger">Nome é obrigatório (mín. 3 caracteres).</div>
+                }
             </div>
+
             <div class="mb-3">
-                <label for="cnpj" class="form-label">CNPJ:</label>
-                <input type="text" class="form-control" id="cnpj" formControlName="cnpj" required />
+                <label for="cpf" class="form-label">CPF:</label>
+                <input type="text" class="form-control" id="cpf" formControlName="cpf" [ngClass]="{
+                                 'is-invalid': formFornecedor.get('cpf')?.invalid && formFornecedor.get('cpf')?.touched,
+                                 'is-valid': formFornecedor.get('cpf')?.valid && formFornecedor.get('cpf')?.touched
+                             }" required />
+                @if(formFornecedor.get('cpf')?.pristine){
+                <div class="form-text">* Campo obrigatório.</div>
+                <div class="form-text">CPF deve conter apenas dígitos.</div>
+                }@else if(formFornecedor.get('cpf')?.errors?.['minlength'] ||
+                formFornecedor.get('cpf')?.errors?.['maxlength']){
+                <div class="form-text text-danger">CPF deve conter 11 dígitos.</div>
+                }
             </div>
+
             <div class="mb-3">
                 <label for="fone" class="form-label">Telefone:</label>
-                <input type="text" class="form-control" id="fone" formControlName="fone" required />
+                <input type="text" class="form-control" id="fone" formControlName="fone" [ngClass]="{
+                                 'is-invalid': formFornecedor.get('fone')?.invalid && formFornecedor.get('fone')?.touched,
+                                 'is-valid': formFornecedor.get('fone')?.valid && formFornecedor.get('fone')?.touched
+                             }" required />
+                @if(formFornecedor.get('fone')?.pristine){
+                <div class="form-text">* Campo obrigatório.</div>
+                }@else if(formFornecedor.get('fone')?.errors?.['minlength']){
+                <div class="form-text text-danger">Telefone deve conter ao menos 10 dígitos.</div>
+                }
             </div>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-            <button type="reset" class="ms-2 btn btn-danger">Limpar</button>
+
+            @if(formFornecedor.invalid){
+            <div class="form-text text-danger mb-4">Preencha todos os campos obrigatórios.</div>
+            }@else {
+            <div class="form-text text-success mb-4">Campos obrigatórios preenchidos.</div>
+            }
+
+            <button type="submit" class="btn btn-primary" [disabled]="formFornecedor.invalid">
+                @if(fornecedorId){ Atualizar }@else { Cadastrar }
+            </button>
+            <button type="reset" class="ms-2 btn btn-danger" (click)="limpar()">Limpar</button>
+            @if(fornecedorId){
+              <button type="button" class="ms-2 btn btn-secondary" (click)="cancelEdit.emit()">Cancelar Edição</button>
+            }
         </form>
     </div>
 </div>

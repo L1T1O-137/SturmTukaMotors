@@ -1,0 +1,42 @@
+<div class="container">
+    @if(produtos.length > 0){
+    <div class="row col-md-8 offset-md-2">
+        <h1 class="text-center">Produtos Cadastrados</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">#</th>
+                    <th scope="col" class="text-center">Nome</th>
+                    <th scope="col" class="text-center">Preço</th>
+                    <th scope="col" class="text-center">Quantidade</th>
+                    <th scope="col" class="text-center">Fornecedor</th>
+                    <th scope="col" class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (produto of produtos; track produto.id) {
+                <tr>
+                    <th scope="row" class="text-center">{{ produto.id }}</th>
+                    <td>{{ produto.nome }}</td>
+                    <td class="text-center">{{ produto.preco | currency:'BRL' }}</td>
+                    <td class="text-center">{{ produto.quantidade }}</td>
+                    <td class="text-center">{{ produto.nomeFornecedor }}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary me-2" (click)="onEditar(produto)">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="onExcluir(produto)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }@else {
+    <div class="row">
+        <h1 class="text-center">Nenhum Produto Cadastrado</h1>
+    </div>
+    }
+</div>

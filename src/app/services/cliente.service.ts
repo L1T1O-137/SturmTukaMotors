@@ -16,4 +16,16 @@ export class ClienteService {
   getAllClientes(): Promise<Cliente[]> {
     return this.dbService.clientes.toArray();
   }
+
+  getClienteById(id: number): Promise<Cliente | undefined> {
+    return this.dbService.clientes.get(id);
+  }
+
+  updateCliente(cliente: Cliente): Promise<number> {
+    return this.dbService.clientes.put(cliente);
+  }
+
+  deleteCliente(id: number): Promise<void> {
+    return this.dbService.clientes.delete(id);
+  }
 }

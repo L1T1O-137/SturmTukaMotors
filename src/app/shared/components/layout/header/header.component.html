@@ -1,26 +1,19 @@
-<nav id="navheader" class="navbar navbar-expand-lg bg-danger" data-bs-theme="dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">SturmTuka</a>
-        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
-            ariacontrols="navbarSupportedContent" aria-expanded="false" arialabel="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Início</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Agendamentos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" routerLink="/fornecedores/cadastro-cliente">Cadastro de Cliente</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" routerLink="/fornecedores/listar-fornecedor">Listar Serviço</a>
-                </li>
-            </ul>
-        </div>
-        
+<header class="header" [class.dark-mode]="isDarkMode">
+    <div class="logo-container">
+        <a routerLink="/" class="logo-link d-flex align-items-center gap-2">
+            <img src="assets/imgs/logo.jpeg" alt="Logo" class="logo-image" (error)="handleImageError($event)">
+            <h1 class="logo-text">Sturm&Stuka Motors</h1>
+        </a>
     </div>
-</nav>
+
+    <nav class="navigation" [class.active]="isMenuOpen" role="navigation">
+        <ul class="nav-list">
+            <li *ngFor="let item of menuItems" class="nav-item">
+                <a [routerLink]="item.link" routerLinkActive="active" class="nav-link"
+                    (click)="handleNavClick($event, item)">
+                    {{item.label}}
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
