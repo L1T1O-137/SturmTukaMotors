@@ -144,18 +144,6 @@ export class ListarAtividadesComponent implements OnInit {
       p.quantidade = p.quantidade - as.quantidade;
       await this.produtoService.updateProduto(p);
     }));
-
-    // Marca como concluída (define dataFim se não houver)
-    if (!a.dataFim) {
-      a.dataFim = new Date().toISOString();
-      await this.atividadeService.updateAtividade(a);
-    }
-
-    await Swal.fire({ icon: 'success', title: 'Concluída!', text: 'Baixa aplicada no estoque com sucesso.', timer: 2200, showConfirmButton: false });
-    await this.load();
-    this.processingIds.delete(a.id);
   }
-
-  isConcluida(a: Atividade): boolean { return !!a.dataFim; }
-  isProcessing(a: Atividade): boolean { return !!a.id && this.processingIds.has(a.id); }
 }
+

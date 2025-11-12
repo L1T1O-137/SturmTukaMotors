@@ -30,7 +30,4 @@ export class AtividadeService {
     return this.db.atividades.where('categoria').equals(categoria).toArray();
   }
 
-  async getAtividadesByFuncionario(funcionarioId: number): Promise<Atividade[]> {
-    return this.db.atividades.where('funcionarioIds').equals(funcionarioId).toArray();
-  }
 }
