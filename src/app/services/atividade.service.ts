@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DbService } from './db.service';
-import { Atividade, CategoriaAtividade, PrioridadeAtividade } from '../modelos/atividade.model';
+import { Atividade, CategoriaAtividade } from '../modelos/atividade.model';
 
 @Injectable({ providedIn: 'root' })
 export class AtividadeService {
@@ -32,9 +32,5 @@ export class AtividadeService {
 
   async getAtividadesByFuncionario(funcionarioId: number): Promise<Atividade[]> {
     return this.db.atividades.where('funcionarioIds').equals(funcionarioId).toArray();
-  }
-
-  async getAtividadesByPrioridade(prioridade: PrioridadeAtividade): Promise<Atividade[]> {
-    return this.db.atividades.where('prioridade').equals(prioridade).toArray();
   }
 }

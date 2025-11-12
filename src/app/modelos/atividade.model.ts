@@ -1,26 +1,19 @@
 export enum CategoriaAtividade {
-  Estudo = 'Estudo',
-  Trabalho = 'Trabalho',
-  Lazer = 'Lazer',
-  Pesquisa = 'Pesquisa'
+  Manutencao = 'Manutenção',
+  Limpeza = 'Limpeza',
+  Eletrica = 'Elétrica',
+  Upgrade = 'Upgrade',
+  Rebaixar = 'Rebaixar'
 }
 
-export enum PrioridadeAtividade {
-  Baixa = 'Baixa',
-  Media = 'Média',
-  Alta = 'Alta',
-  Urgente = 'Urgente'
-}
 
 export interface Atividade {
   id?: number;
   nome: string;
   descricao: string;
-  dataInicio: string; // ISO date string
-  dataFim?: string;   // ISO date string
+  dataInicio: string; // ISO data string
+  dataFim?: string;   // ISO data string
   categoria: CategoriaAtividade;
-  prioridade: PrioridadeAtividade;
   servicoId?: number;      // vínculo ao serviço (opcional)
   clienteId?: number;      // vínculo ao cliente (opcional)
-  funcionarioIds: number[]; // multi usuários (funcionários)
 }

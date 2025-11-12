@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Atividade, CategoriaAtividade, PrioridadeAtividade } from '../../../modelos/atividade.model';
+import { Atividade, CategoriaAtividade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ProdutoServicoService } from '../../../services/produto-servico.service';
@@ -19,7 +19,6 @@ export class ListarAtividadesComponent implements OnInit {
   atividades: Atividade[] = [];
   filtered: Atividade[] = [];
   categorias = Object.values(CategoriaAtividade);
-  prioridades = Object.values(PrioridadeAtividade);
   funcionarios: any[] = [];
 
   // Controle visual
@@ -27,7 +26,7 @@ export class ListarAtividadesComponent implements OnInit {
 
   filtroCategoria: CategoriaAtividade | 'Todas' = 'Todas';
   filtroFuncionarioId: number | 'Todos' = 'Todos';
-  filtroPrioridade: PrioridadeAtividade | 'Todas' = 'Todas';
+
 
   constructor(
     private atividadeService: AtividadeService,
@@ -57,10 +56,7 @@ export class ListarAtividadesComponent implements OnInit {
 
     this.filtered = this.atividades.filter(a => {
       const catOk = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
-      const priOk = this.filtroPrioridade === 'Todas' || a.prioridade === this.filtroPrioridade;
-      const funOk = this.filtroFuncionarioId === 'Todos' || a.funcionarioIds.includes(this.filtroFuncionarioId as number);
-      return catOk && priOk && funOk;
-    }).sort((a, b) => (priorityRank[b.prioridade] ?? 0) - (priorityRank[a.prioridade] ?? 0));
+    });
   }
 
   addAtividade(): void {

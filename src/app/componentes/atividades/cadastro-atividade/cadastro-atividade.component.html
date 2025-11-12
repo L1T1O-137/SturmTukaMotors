@@ -33,12 +33,6 @@
 
       <div class="row">
         <div class="mb-3 col-md-6">
-          <label class="form-label">Prioridade</label>
-          <select class="form-select" formControlName="prioridade">
-            <option *ngFor="let p of prioridades" [value]="p">{{p}}</option>
-          </select>
-        </div>
-        <div class="mb-3 col-md-6">
           <label class="form-label">Serviço</label>
           <select class="form-select" formControlName="servicoId">
             <option [ngValue]="null">Selecione...</option>
@@ -54,15 +48,6 @@
             <option [ngValue]="null">Selecione...</option>
             <option *ngFor="let c of clientes" [value]="c.id">{{c.nome}}</option>
           </select>
-        </div>
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Funcionários</label>
-          <div class="border rounded p-2" style="max-height: 180px; overflow:auto;">
-            <div class="form-check" *ngFor="let f of funcionarios">
-              <input class="form-check-input" type="checkbox" [checked]="formAtividade.value.funcionarioIds?.includes(f.id)" (change)="toggleFuncionario(f.id)">
-              <label class="form-check-label">{{f.nome}} - {{f.funcao}}</label>
-            </div>
-          </div>
         </div>
       </div>
 

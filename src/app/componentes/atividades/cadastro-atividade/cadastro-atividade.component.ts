@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoriaAtividade, PrioridadeAtividade, Atividade } from '../../../modelos/atividade.model';
+import { CategoriaAtividade, Atividade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
 import { ServicoService } from '../../../services/servico.service';
 import { ClienteService } from '../../../services/cliente.service';
-import { FuncionarioService } from '../../../services/funcionario.service';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -18,7 +17,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class CadastroAtividadeComponent implements OnInit {
   categorias = Object.values(CategoriaAtividade);
-  prioridades = Object.values(PrioridadeAtividade);
 
   servicos: any[] = [];
   clientes: any[] = [];
@@ -32,27 +30,23 @@ export class CadastroAtividadeComponent implements OnInit {
     descricao: ['', Validators.required],
     dataInicio: ['', Validators.required],
     dataFim: [''],
-    categoria: [CategoriaAtividade.Trabalho, Validators.required],
-    prioridade: [PrioridadeAtividade.Media, Validators.required],
+    categoria: [CategoriaAtividade.Manutencao, Validators.required],
     servicoId: [null],
     clienteId: [null],
-    funcionarioIds: [[] as number[]]
   });
 
   constructor(
     private atividadeService: AtividadeService,
     private servicoService: ServicoService,
     private clienteService: ClienteService,
-    private funcionarioService: FuncionarioService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // Load select options
+    // carrega dados para selects
     this.servicos = await this.servicoService.getAllServicos();
     this.clientes = await this.clienteService.getAllClientes();
-    this.funcionarios = await this.funcionarioService.getAllFuncionarios();
 
     // Edit mode
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -68,22 +62,11 @@ export class CadastroAtividadeComponent implements OnInit {
             dataInicio: atividade.dataInicio,
             dataFim: atividade.dataFim || '',
             categoria: atividade.categoria,
-            prioridade: atividade.prioridade,
             servicoId: (atividade.servicoId as any) ?? null,
             clienteId: (atividade.clienteId as any) ?? null,
-            funcionarioIds: atividade.funcionarioIds
           });
         }
       }
-    }
-  }
-
-  toggleFuncionario(id: number): void {
-    const current = this.formAtividade.value.funcionarioIds as number[];
-    if (current.includes(id)) {
-      this.formAtividade.get('funcionarioIds')?.setValue(current.filter(f => f !== id));
-    } else {
-      this.formAtividade.get('funcionarioIds')?.setValue([...current, id]);
     }
   }
 
@@ -97,10 +80,8 @@ export class CadastroAtividadeComponent implements OnInit {
       dataInicio: v.dataInicio!,
       dataFim: v.dataFim || undefined,
       categoria: v.categoria!,
-      prioridade: v.prioridade!,
       servicoId: v.servicoId || undefined,
       clienteId: v.clienteId || undefined,
-      funcionarioIds: v.funcionarioIds || []
     };
 
     const op = this.atividadeId ? this.atividadeService.updateAtividade(atividade) : this.atividadeService.addAtividade(atividade);
