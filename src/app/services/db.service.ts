@@ -30,14 +30,15 @@ export class DbService extends Dexie {
     // v4: adicionadas tabelas servicos e produtosServico
     // v5: adicionada tabela funcionarios e ajustados índices de clientes
     // v6: adicionada tabela atividades com índice em funcionarioIds
-    this.version(6).stores({
+    // v7: Removido índice em prioridade de atividades
+    this.version(7).stores({
       fornecedores: '++id, nome, cpf, fone',
       clientes: '++id, nome, cpf, fone, email, fotoUrl, endereco',
       produtos: '++id, nome, preco, quantidade, fornecedorId',
       servicos: '++id, nome, descricao, preco',
       produtosServico: '[servicoId+produtoId], servicoId, produtoId, quantidade',
       funcionarios: '++id, nome, fone, email, fotoUrl, funcao, dataAdmissao',
-      atividades: '++id, nome, categoria, prioridade, dataInicio, dataFim, clienteId, servicoId, funcionarioIds*'
+      atividades: '++id, nome, categoria, dataInicio, dataFim, clienteId, servicoId, funcionarioIds*'
     });
   }
 }

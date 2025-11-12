@@ -47,15 +47,9 @@ export class ListarAtividadesComponent implements OnInit {
   }
 
   applyFilters(): void {
-    const priorityRank: Record<string, number> = {
-      Urgente: 4,
-      Alta: 3,
-      'Média': 2,
-      Baixa: 1
-    };
-
     this.filtered = this.atividades.filter(a => {
-      const catOk = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
+      const categoriaMatch = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
+      return categoriaMatch;
     });
   }
 

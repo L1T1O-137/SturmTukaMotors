@@ -2,19 +2,12 @@
   <div class="row col-md-12">
     <h1 class="text-center my-4">Atividades</h1>
 
-    <div class="row g-3 mb-3">
+    <div class="d-flex justify-content-center mb-3">
       <div class="col-md-4">
         <label class="form-label">Categoria</label>
         <select class="form-select" (change)="filtroCategoria = $any($event.target).value; applyFilters()">
           <option value="Todas">Todas</option>
           <option *ngFor="let c of categorias" [value]="c">{{c}}</option>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Funcionário</label>
-        <select class="form-select" (change)="filtroFuncionarioId = $any($event.target).value; applyFilters()">
-          <option value="Todos">Todos</option>
-          <option *ngFor="let f of funcionarios" [value]="f.id">{{f.nome}} - {{f.funcao}}</option>
         </select>
       </div>
     </div>
