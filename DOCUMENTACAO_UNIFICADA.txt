@@ -1,0 +1,249 @@
+DOCUMENTAÇÃO UNIFICADA — SturmTukaMotors
+
+Sumário executivo
+- Objetivo: documentar de forma clara e completa as mudanças realizadas (sistema de Prioridades nas Atividades) e descrever toda a arquitetura e código relevante do projeto para apresentação a um professor.
+- Entregáveis aqui: descrição das alterações feitas para Prioridades, explicação detalhada de cada arquivo/pasta importante em `src/app`, instruções para rodar/testar, observações técnicas (migre/DB, formato de datas), e próximos passos sugeridos.
+
+Parte A — Sistema de Prioridades (mudanças aplicadas)
+Resumo objetivo
+- Foi adicionado um sistema de prioridades para as atividades com níveis: Baixa, Média, Alta e Urgente.
+- Mudanças aplicadas de forma conservadora para não introduzir outras features (comentários, lembretes, tags, compartilhamento, gamificação).
+- Escopo implementado: modelo (enum), formulário de cadastro, listagem com badge e filtro, migração do DB para popular prioridades existentes.
+
+Arquivos alterados (detalhado)
+1) `src/app/modelos/atividade.model.ts`
+- O que foi adicionado:
+  - enum `Prioridade` com os valores: 'Baixa', 'Média', 'Alta', 'Urgente'.
+  - campo opcional `prioridade?: Prioridade` na interface `Atividade`.
+- Por que:
+  - Permitir tipagem e consistência no app, controlar visualmente e por lógica quais atividades são mais urgentes.
+- Observação sobre datas (`dataInicio` / `dataFim`):
+  - Esses campos usam strings no formato ISO 8601 (comentado no código como "// ISO data string").
+  - Exemplos: `2025-11-12T14:30:00Z` (UTC) ou `2025-11-12T11:30:00-03:00` (com offset).
+  - Vantagens do ISO 8601: padrão internacional, lexicalmente ordenável e parseável por `new Date(isoString)` no JavaScript.
+  - Atenção: considerar fuso horário ao exibir; recomenda-se usar bibliotecas como date-fns ou Luxon para formatação/parsing robusto.
+
+2) `src/app/services/db.service.ts`
+- O que foi alterado:
+  - Import do enum `Prioridade` do model.
+  - Bump da versão do Dexie DB para v9.
+  - Atualização do schema de `atividades` para incluir `prioridade`.
+  - Adição de um `.upgrade(...)` que percorre a coleção `atividades` e define `prioridade = Prioridade.Media` quando ausente.
+- Por que:
+  - Persistir o novo campo nas atividades existentes e evitar que registros antigos fiquem sem essa propriedade.
+- Observação técnica:
+  - A migração usa `toCollection().modify(...)`. Em caso de erro a migração loga a falha e não impede a abertura do DB.
+
+3) `src/app/componentes/atividades/cadastro-atividade/*`
+- `cadastro-atividade.component.ts`:
+  - Importa `Prioridade` e cria `prioridades = Object.values(Prioridade)` para popular o select.
+  - Adiciona `prioridade` no FormGroup com valor padrão `Prioridade.Media` e validação.
+  - No submit inclui `prioridade` no objeto `Atividade` enviado ao serviço.
+- `cadastro-atividade.component.html`:
+  - Adiciona o campo `<select>` para escolher a prioridade.
+- Por que:
+  - Permitir que o usuário escolha prioridade ao criar/editar atividades.
+
+4) `src/app/componentes/atividades/listar-atividades/*`
+- `listar-atividades.component.ts`:
+  - Importa `Prioridade` e cria `prioridades` para o filtro.
+  - Adiciona `filtroPrioridade` e altera `applyFilters()` para checar categoria e prioridade.
+  - `priorityClass(p?: Prioridade)` retorna classes CSS (bootstrap badges) para destacar visualmente a prioridade.
+  - Funções: deleteAtividade (confirmação com Swal), concluirAtividade (verifica associações produto-serviço e aplica baixa de estoque).
+- `listar-atividades.component.html`:
+  - Adiciona select para filtro por prioridade e mostra badge em cada item.
+- Por que:
+  - Facilitar priorização visual e filtragem de atividades.
+
+Parte B — Visão geral do projeto (todos os códigos relevantes)
+Arquitetura
+- Stack: Angular (componentes, roteamento), Dexie (IndexedDB) para persistência local.
+- Separação de responsabilidades: modelos (tipos/classes), serviços (acesso e lógica), componentes (UI e fluxo do usuário).
+
+Principais arquivos e papéis
+- `src/app/app.component.ts` / `app.component.html` / `app.routes.ts`:
+  - `AppComponent` monta header/footer e `RouterOutlet`.
+  - `app.routes.ts` define todas as rotas principais (home, fornecedores, servicos, estoque, clientes, atividades).
+
+- `src/app/modelos/` (modelos de domínio):
+  - `atividade.model.ts`: Atividade, CategoriaAtividade, Prioridade (ver Parte A).
+  - `cliente.model.ts`: `Cliente` (classe que estende `Pessoa`) com `cpf`, `endereco`.
+  - `fornecedor.model.ts`: interface `Fornecedor`.
+  - `produto.model.ts`: classe `Produto` (estoque, preco, quantidade, fornecedorId).
+  - `servico.model.ts`: classe `Servico`.
+  - `pessoa.model.ts`: classe abstrata `Pessoa` usada por Cliente/Funcionario.
+  - `funcionario.model.ts`: `Funcionario` estendendo `Pessoa` com `funcao` e `dataAdmissao`.
+  - `produto-servico.model.ts`: relacionamento entre produtos e serviços com quantidade.
+
+- `src/app/services/` (acesso a dados e regras simples):
+  - `db.service.ts` (Dexie): centraliza schema, índices e migrações.
+  - `atividade.service.ts`: CRUD e buscas para atividades.
+  - `cliente.service.ts`, `fornecedor.service.ts`, `produto.service.ts`, `servico.service.ts`, `funcionario.service.ts`, `produto-servico.service.ts`:
+    - Encapsulam operações de leitura e escrita no IndexedDB via `db` ou `DbService`.
+    - Mantêm a lógica de persistência separada da UI.
+
+- `src/app/componentes/` (UI): estrutura por domínio
+  - `atividades`:
+    - `cadastro-atividade`: formulário reativo com validação e select de prioridade.
+    - `listar-atividades`: listagem com filtros (categoria/prioridade), badges e ações (editar, deletar, concluir).
+  - `clientes`:
+    - `cadastro-cliente`: formulário com upload de foto (FileReader), validação, salvar/editar via `ClienteService`.
+    - `listar-clientes`: listagem com paginação simples e ações.
+  - `fornecedores`:
+    - CRUD e listagem de fornecedores; `listar-produtos-fornecedor` mostra produtos por fornecedor.
+  - `produtos`:
+    - Cadastro/listagem, controle de estoque via `ProdutoService`.
+  - `servicos`:
+    - Cadastro/listagem e `associacao-produtos-servico` para ligar produtos a serviços (necessário para baixa de estoque ao concluir atividades).
+  - `estoque`:
+    - Painel com abas para gerenciar produtos e visualizar listagens.
+  - `home`:
+    - Página inicial com resumo/atalhos.
+
+- `src/app/shared/components/layout`:
+  - `HeaderComponent`: menu, tema (dark mode), fallback de imagens.
+  - `FooterComponent`: rodapé.
+
+Parte C — Como rodar e validar (passo-a-passo)
+1) Instalar dependências (uma vez):
+   npm install
+2) Rodar aplicação em modo desenvolvimento:
+   npm start
+3) Fluxo de testes recomendados:
+   - Cadastre alguns `Fornecedores`, `Produtos` e `Serviços`.
+   - Associe produtos a um serviço (via `associacao-produtos-servico`).
+   - Cadastre atividades com diferentes `prioridade`: verifique o select no cadastro e os badges na listagem.
+   - Conclua uma atividade associada a um serviço para confirmar a baixa de estoque (listar-atividades -> concluirAtividade flow).
+4) Bancos/DB e migração:
+   - Ao abrir a aplicação, o Dexie criará/atualizará IndexedDB. v9 populou o campo `prioridade` como `Média` onde estava ausente.
+
+Parte D — Explicações técnicas e dicas para apresentação
+- Formato ISO 8601 para datas (repetindo porque é importante):
+  - Use sempre ISO strings para persistência (evita ambiguidade).
+  - Exemplo: `2025-11-12T14:30:00Z`.
+  - Ao exibir para o usuário, formate para a localidade (date-fns/luxon).
+
+- Migrações com Dexie:
+  - Atualizar a versão no `.version()` e encadear `.upgrade(tx => { ... })` para transformar dados antigos.
+  - Always handle exceptions in upgrade to avoid breaking db open.
+
+- Boas práticas adotadas no projeto:
+  - Componentes pequenos, focados em responsabilidade única.
+  - Serviços responsáveis por todas as operações com o DB.
+  - Uso de FormBuilder + ReactiveForms para validação robusta.
+  - Confirmações e feedback com SweetAlert2 (Swal) para melhorar UX.
+
+Parte E — Trechos de código importantes (exemplos para apresentar)
+- Enum Prioridade (em `atividade.model.ts`):
+  - Prioridade: Baixa | Média | Alta | Urgente — usado em formulários, filtros e badges na lista.
+
+- Migração DB (trecho explicativo):
+  - Ao subir para v9, as atividades sem `prioridade` recebem `Prioridade.Media` via `toCollection().modify(...)`.
+
+- Trecho de form (cadastro-atividade):
+  - Adiciona formControl `prioridade` com default `Prioridade.Media` e validação `Validators.required`.
+
+Parte F — Observações sobre remoções solicitadas (recapitulando)
+- Foi solicitado anteriormente que o repositório permanecesse apenas com a feature de Prioridades (sem alertas, comentários, tags, compartilhamento, gamificação).
+- Realizei buscas e confirmei que não existem implementações completas dessas features. Os matches encontrados foram, em sua maioria, falsos-positivos (imports genéricos de `SweetAlert2` e comentários/labels).
+- Nenhuma remoção adicional foi necessária; tudo o que foi alterado ou adicionado está documentado neste arquivo.
+
+Parte G — TODOs e melhorias sugeridas
+- Adicionar testes unitários e e2e automáticos para os fluxos: criar atividade, filtrar por prioridade, concluir atividade (baixa de estoque).
+- Persistir preferências do filtro (localStorage) e adicionar ordenação por prioridade.
+- Internacionalização/locale-aware formatting de datas.
+- Monitoramento/telemetria (opcional) e logs estruturados.
+
+Parte I — Explicações adicionais por arquivo lido
+
+Nos itens abaixo documentei em detalhes arquivos .ts adicionais que foram lidos e que complementam a documentação principal. Use essas notas ao apresentar o código ou ao navegar pelo repositório.
+
+- `src/app/modelos/produto-servico.model.ts`
+  - Classe `ProdutoServico` que representa a associação entre `Servico` e `Produto`.
+  - Campos: `servicoId`, `produtoId`, `quantidade`.
+  - Observação: a tabela no Dexie usa chaves compostas `[servicoId+produtoId]` para garantir unicidade da associação.
+
+- `src/app/services/produto-servico.service.ts`
+  - Serviço responsável por operações de CRUD/consulta na tabela de associações `produtosServico`.
+  - Métodos principais:
+    - `getAllProdutosServicos()` : retorna todas as associações.
+    - `getAssociacoesByServicoId(servicoId)` : filtra associações por `servicoId`.
+    - `getAssociacoesById(servicoId, produtoId)` : busca associação específica (usa objeto de query `{servicoId, produtoId}`).
+    - `deleteServicoProdutoAssociacao(servicoId, produtoId)` : remove associação por chave composta.
+    - `addMultiplosProdutosServicoAssociacoes(associations)` : insere/atualiza múltiplas associações via `bulkPut` (útil quando associa-se vários produtos a um serviço).
+    - `addProdutoServico` / `updateProdutoServico` / `deleteProdutoServico` : helpers de conveniência.
+  - Nota técnica: o `bulkPut` de Dexie retorna chaves; para chaves compostas pode ser necessário converte-los/cast.
+
+- `src/app/services/funcionario.service.ts`
+  - Serviço simples para CRUD de `Funcionario` que utiliza `DbService` (injeção do `DbService`) — fornece `addFuncionario`, `getAllFuncionarios`, `getFuncionarioById`, `updateFuncionario`, `deleteFuncionario`.
+  - Observação: segue o padrão dos demais serviços do repositório (cada entidade tem um serviço dedicado que encapsula o acesso ao IndexedDB).
+
+- `src/app/componentes/servicos/*` (vários arquivos)
+  - `servicos.component.ts`: hub do módulo de serviços que controla abas (listagem, cadastro, associação). Recebe `id` pela rota para entrar direto no modo edição quando aplicável.
+  - `listar-servicos.component.ts`: lista serviços com ações: editar (emite evento), delete (confirmação com Swal), novo (emite evento), associar produtos (emite e navega opcionalmente). Também atualiza a URL ao editar para suportar deep-link.
+  - `cadastro-servico.component.ts`: formulário reativo para criar/editar `Servico` (nome, descrição, preço). Emite `saved` quando conclui.
+  - `associacao-produtos-servico.component.ts`: componente standalone que oferece UI drag-and-drop (Angular CDK DragDrop) para arrastar produtos entre colunas (disponíveis e selecionados). Principais pontos:
+    - Carrega todos produtos via `ProdutoService` e associações existentes via `ProdutoServicoService`.
+    - Mantém `produtosSelecionadosIds` (Set) para checar status e `quantidades` (Map) para quantidade por produto.
+    - Ao arrastar para a coluna de selecionados pede ao usuário a quantidade via `Swal.fire({input:'number'})` e persiste a associação no IndexedDB.
+    - Ao remover um produto da associação, deleta o relacionamento no DB.
+  - Por que isso importa: a associação produto-serviço é usada quando uma `Atividade` conclui — se vinculada a um serviço, a conclusão deve reduzir os estoques dos produtos associados.
+
+- `src/app/componentes/produtos/*` (cadastro/listar)
+  - `cadastro-produto.component.ts`:
+    - Form reativo para `Produto` com campos: nome, preço, quantidade, fornecedorId.
+    - Carrega lista de fornecedores para popular o select (`fornecedores`), injeta `FormBuilder` com `inject()`.
+    - Suporta modo edição (recebe `produtoEdit` do pai) e emite `saved`/`cancelEdit`.
+  - `listar-produtos.component.ts`:
+    - Lista produtos e resolve o nome do fornecedor para exibição (usa cache `fornecedoresMap` para evitar múltiplas leituras no DB).
+    - Handle de exclusão com confirmação via SweetAlert2; após exclusão recarrega a lista.
+
+- `src/app/componentes/fornecedores/*` (fornecedores.component.ts e listar-produtos-fornecedor)
+  - `fornecedores.component.ts`: hub com abas (cadastro/listagem) e passagem de eventos para recarregar a lista quando necessário.
+  - `listar-produtos-fornecedor.component.ts`: mostra os produtos filtrados por `fornecedorId` (lido de rota) e busca o nome do fornecedor para título.
+
+- `src/app/componentes/estoque/estoque.component.ts`
+  - Hub do módulo de estoque que alterna entre abas de cadastro e listagem e mantém referência ao `ListarProdutosComponent` para forçar reloads após operações.
+
+- `src/app/shared/components/layout/footer/footer.component.ts`
+  - Componente simples de rodapé (`FooterComponent`) — placeholder para conteúdo estático de fim de página.
+
+Parte J — Pontos relevantes detectados durante leitura
+
+- Padrão consistente: quase todos os módulos seguem o mesmo padrão "hub" (componente pai controlando abas) + componentes filho (`listar`, `cadastro`) que emitem eventos para atualizar o pai. Isso facilita apresentação: explique o padrão uma vez e mostre 2-3 exemplos.
+- Uso de Angular CDK DragDrop no `associacao-produtos-servico` é um diferencial técnico interessante para demonstrar habilidades com bibliotecas Angular.
+- O uso de Map/Set nos componentes para cachear e controlar estado local (quantidades, selected ids) é uma boa prática leve que evita múltiplas leituras ao IndexedDB.
+
+Parte K — Explicações para serviços e modelos adicionais
+
+- `src/app/services/servico.service.ts`
+  - Serviço CRUD simples para `Servico` usando o `db` exportado por `DbService`.
+  - Métodos: `addServico`, `getAllServicos`, `getServicoById`, `updateServico`, `deleteServico`.
+
+- `src/app/services/produto.service.ts`
+  - Serviço CRUD para `Produto` com métodos assíncronos: `getAllProdutos`, `addProduto`, `updateProduto`, `deleteProduto`, `getProdutoById`, `getProdutosByFornecedorId`.
+  - `getProdutosByFornecedorId` é usado pela tela `listar-produtos-fornecedor`.
+
+- `src/app/services/fornecedor.service.ts`
+  - Serviço CRUD para `Fornecedor` com métodos: `getAllFornecedores`, `addFornecedor`, `deleteFornecedor`, `updateFornecedor`, `getFornecedorById`.
+  - Usado para popular selects de fornecedores e resolver nomes nos produtos.
+
+- `src/app/services/atividade.service.ts`
+  - Serviço que injeta `DbService` e fornece operações para `Atividade`: `addAtividade`, `getAllAtividades`, `getAtividadeById`, `updateAtividade`, `deleteAtividade`, `getAtividadesByCategoria`.
+  - Observação: o serviço é a entrada recomendada para qualquer lógica adicional sobre atividades (ex: validações, regras de negócio) para evitar espalhar lógica por componentes.
+
+- `src/app/services/cliente.service.ts`
+  - Serviço CRUD para `Cliente` que delega para `DbService` (convenção: serviços que tratam entidades com relacionamentos mais complexos usam `DbService` diretamente via injeção).
+
+- `src/app/services/db.service.ts` (resumo técnico)
+  - Extende `Dexie` e define tabelas (fornecedores, clientes, produtos, serviços, produtosServico, funcionarios, atividades).
+  - As stores definem índices para buscas eficientes (ex.: `produtos` indexado por `fornecedorId`).
+  - Migração v9 implementada para garantir `prioridade` nas atividades.
+
+- `src/app/modelos/produto.model.ts`, `servico.model.ts`, `fornecedor.model.ts`
+  - `Produto`: clase com `id`, `nome`, `preco`, `quantidade`, `fornecedorId` e `nomeFornecedor?` (este último para exibição resolvida em tempo de execução).
+  - `Servico`: classe com `id`, `nome`, `descricao`, `preco`.
+  - `Fornecedor`: interface leve usada para persistência.
+
+
+

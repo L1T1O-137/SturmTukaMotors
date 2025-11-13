@@ -6,7 +6,7 @@ import { Produto } from '../modelos/produto.model';
 import { Servico } from '../modelos/servico.model';
 import { ProdutoServico } from '../modelos/produto-servico.model';
 import { Funcionario } from '../modelos/funcionario.model';
-import { Atividade } from '../modelos/atividade.model';
+import { Atividade, Prioridade } from '../modelos/atividade.model';
 
 @Injectable({ providedIn: 'root' })
 export class DbService extends Dexie {
@@ -31,14 +31,28 @@ export class DbService extends Dexie {
     // v5: adicionada tabela funcionarios e ajustados índices de clientes
     // v6: adicionada tabela atividades com índice em funcionarioIds
     // v7: Removido índice em prioridade de atividades
-    this.version(7).stores({
+    // v8: adicionada propriedade 'prioridade' às atividades e ajustado schema
+    // v9: migração para popular campo 'prioridade' em atividades existentes
+  this.version(9).stores({
       fornecedores: '++id, nome, cpf, fone',
       clientes: '++id, nome, cpf, fone, email, fotoUrl, endereco',
       produtos: '++id, nome, preco, quantidade, fornecedorId',
       servicos: '++id, nome, descricao, preco',
       produtosServico: '[servicoId+produtoId], servicoId, produtoId, quantidade',
       funcionarios: '++id, nome, fone, email, fotoUrl, funcao, dataAdmissao',
-      atividades: '++id, nome, categoria, dataInicio, dataFim, clienteId, servicoId, funcionarioIds*'
+      atividades: '++id, nome, categoria, dataInicio, dataFim, clienteId, servicoId, funcionarioIds*, prioridade'
+    }).upgrade(async (tx) => {
+      // Ao atualizar para v9, garanta que atividades existentes tenham prioridade definida
+      try {
+        await tx.table('atividades').toCollection().modify((a: any) => {
+          if (!a.prioridade) {
+            a.prioridade = Prioridade.Media;
+          }
+        });
+      } catch (e) {
+        // Se a migração falhar por qualquer razão, apenas ignore para não bloquear o db aberto
+        console.error('Erro durante migração de prioridades (v9):', e);
+      }
     });
   }
 }
