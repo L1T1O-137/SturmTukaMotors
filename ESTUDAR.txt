@@ -1,0 +1,575 @@
+TÍTULO: SturmTukaMotors — Explicação linha a linha (TypeScript) com foco em prioridades e atividades
+
+1) Visão geral
+- Framework: Angular (arquivos angular.json, tsconfig, estrutura src/app).
+- Arquivos TS principais detectados:
+  - src/main.ts
+  - src/app/app.config.ts
+  - src/app/app.routes.ts
+  - src/app/app.component.ts
+  - src/app/app.component.spec.ts
+
+2) src/main.ts — Bootstrap da aplicação (exemplo típico + explicação)
+(código)
+import { bootstrapApplication } from '@angular/platform-browser'; -> Importa a função que inicializa (bootstrap) uma aplicação Angular standalone.
+import { appConfig } from './app/app.config';                   -> Importa as configurações globais da aplicação (providers, router, etc).
+import { AppComponent } from './app/app.component';             -> Importa o componente raiz que será renderizado.
+
+bootstrapApplication(AppComponent, appConfig)                   -> Inicializa a app: usa AppComponent como raiz e aplica appConfig.
+  .catch((err) => console.error(err));                          -> Captura e loga erros de bootstrap para facilitar debug.
+
+3) src/app/app.config.ts — Configuração global (exemplo típico + explicação)
+(código)
+import { ApplicationConfig } from '@angular/core'; -> Tipo para as configurações da aplicação em modo standalone.
+import { provideRouter } from '@angular/router';   -> Função que registra o roteador na aplicação.
+import { routes } from './app.routes';             -> Importa o array de rotas definido no arquivo de rotas.
+
+export const appConfig: ApplicationConfig = {      -> Exporta o objeto de configuração para ser usado no bootstrap.
+  providers: [                                     -> Lista de provedores globais (DI - injeção de dependência).
+    provideRouter(routes)                          -> Habilita o roteamento com as rotas definidas.
+  ]
+};                                                 -> Fecha o objeto de configuração.
+
+4) src/app/app.routes.ts — Rotas (exemplo típico + explicação)
+(código)
+import { Routes } from '@angular/router';     -> Importa o tipo Routes (array de definição de rotas).
+import { AppComponent } from './app.component'; -> (Opcional) Importa um componente para rotas simples; pode variar conforme seu projeto.
+
+export const routes: Routes = [               -> Declara as rotas da aplicação.
+  { path: '', component: AppComponent }       -> Rota raiz ('') exibindo AppComponent (exemplo simples). Pode haver outras rotas.
+];                                            -> Fecha o array de rotas.
+
+5) src/app/app.component.ts — Componente raiz (exemplo típico + explicação)
+(código)
+import { Component } from '@angular/core';                -> Importa o decorator Component para declarar um componente.
+import { RouterOutlet } from '@angular/router';           -> Importa RouterOutlet para suportar rotas no template.
+
+@Component({                                              -> Declaração do componente.
+  selector: 'app-root',                                   -> Tag HTML usada para renderizar o componente raiz.
+  standalone: true,                                       -> Indica que é um componente standalone (sem NgModule).
+  imports: [RouterOutlet],                                -> Importa dependências usadas no template (ex.: <router-outlet/>).
+  templateUrl: './app.component.html',                    -> Template externo (HTML) do componente.
+  styleUrls: ['./app.component.css']                      -> Arquivo(s) de estilo do componente.
+})
+export class AppComponent {                               -> Classe do componente.
+  title = 'sturm-tuka-motors';                            -> Propriedade de exemplo (usada no template).
+}                                                         -> Fim do componente.
+
+6) src/app/app.component.spec.ts — Testes de unidade do componente (exemplo típico + explicação)
+(código)
+import { TestBed } from '@angular/core/testing';               -> Utilitários de teste do Angular.
+import { RouterTestingModule } from '@angular/router/testing'; -> Módulo de testes de rota (se o template usa rotas).
+import { AppComponent } from './app.component';                -> Importa o componente a ser testado.
+
+describe('AppComponent', () => {                               -> Agrupa os testes do AppComponent.
+  beforeEach(async () => {                                     -> Hook executado antes de cada teste.
+    await TestBed.configureTestingModule({                     -> Configura um módulo de teste.
+      imports: [RouterTestingModule, AppComponent],            -> Importa dependências e o componente standalone.
+    }).compileComponents();                                    -> Compila os componentes para teste.
+  });
+
+  it('deve criar o componente', () => {                        -> Caso de teste: verifica instânciação.
+    const fixture = TestBed.createComponent(AppComponent);     -> Cria o componente em ambiente de teste.
+    const app = fixture.componentInstance;                      -> Obtém a instância do componente.
+    expect(app).toBeTruthy();                                  -> Verifica que foi criado com sucesso.
+  });
+
+  it(`deve ter o título 'sturm-tuka-motors'`, () => {          -> Verifica o valor da propriedade 'title'.
+    const fixture = TestBed.createComponent(AppComponent);     -> Cria o componente.
+    const app = fixture.componentInstance;                      -> Instância do componente.
+    expect(app.title).toEqual('sturm-tuka-motors');            -> Asserção do valor.
+  });
+});                                                            -> Fim do bloco de testes.
+
+7) FOCO ESPECIAL: Prioridades e Atividades (código completo e explicação)
+
+Objetivo: demonstrar um módulo simples de atividades onde:
+- Cada atividade tem título, descrição, prioridade e status de conclusão.
+- Ordenamos por prioridade e, em caso de empate, por prazo.
+- Fornecemos um serviço reativo para CRUD em memória (poderia evoluir para HTTP).
+
+7.1) models/priority.ts — Enum de prioridades
+(código)
+export enum Priority {                 -> Declara enum para priorizar atividades.
+  Baixa = 1,                           -> Baixa prioridade com peso 1.
+  Media = 2,                           -> Média prioridade com peso 2.
+  Alta = 3,                            -> Alta prioridade com peso 3 (maior peso = mais importante).
+}                                       -> Fim do enum.
+
+7.2) models/activity.ts — Interface da atividade
+(código)
+import { Priority } from './priority';          -> Importa o enum de prioridade para tipagem forte.
+
+export interface Activity {                      -> Define o contrato de uma atividade.
+  id: string;                                    -> Identificador único (ex.: UUID).
+  titulo: string;                                -> Título da atividade.
+  descricao?: string;                            -> Descrição opcional.
+  prioridade: Priority;                          -> Prioridade (enum).
+  concluida: boolean;                            -> Status de conclusão.
+  prazo?: Date;                                  -> Prazo opcional (para urgência temporal).
+  criadoEm: Date;                                -> Timestamp de criação.
+  atualizadoEm?: Date;                           -> Timestamp de última atualização.
+}                                                -> Fim da interface.
+
+7.3) utils/priority-sort.ts — Ordenação por prioridade e prazo
+(código)
+import { Activity } from '../models/activity';            -> Importa o tipo Activity para parâmetros do comparador.
+
+export function sortByPriorityThenDueDate(                -> Função de ordenação para usar em Array.sort.
+  a: Activity, b: Activity
+): number {
+  if (a.prioridade !== b.prioridade) {                    -> Primeiro critério: prioridade.
+    return b.prioridade - a.prioridade;                   -> Maior prioridade primeiro (Alta > Média > Baixa).
+  }
+  const ad = a.prazo ? new Date(a.prazo).getTime() : Infinity; -> Sem prazo => vai para o fim.
+  const bd = b.prazo ? new Date(b.prazo).getTime() : Infinity; -> Idem para b.
+  return ad - bd;                                         -> Desempate: prazo mais próximo primeiro.
+}                                                         -> Fim do comparador.
+
+7.4) services/activity.service.ts — Serviço reativo (CRUD em memória)
+(código)
+import { Injectable } from '@angular/core';                  -> Permite injetar o serviço na aplicação.
+import { BehaviorSubject, Observable } from 'rxjs';          -> Estado reativo (BehaviorSubject) e tipo Observable.
+import { Activity } from '../models/activity';               -> Tipagem da entidade Activity.
+import { sortByPriorityThenDueDate } from '../utils/priority-sort'; -> Função de ordenação.
+
+@Injectable({ providedIn: 'root' })                          -> Serviço disponível globalmente (singleton).
+export class ActivityService {
+  private readonly state$ = new BehaviorSubject<Activity[]>([]); -> Estado interno com a lista de atividades.
+
+  list(): Observable<Activity[]> {                          -> Exposição somente-leitura (Observable) para componentes.
+    return this.state$.asObservable();                      -> Evita que consumidores façam next() diretamente.
+  }
+
+  upsert(activity: Activity): void {                        -> Cria ou atualiza uma atividade.
+    const items = this.state$.getValue();                   -> Recupera a lista atual.
+    const idx = items.findIndex(i => i.id === activity.id); -> Verifica se já existe pelo id.
+    const now = new Date();                                 -> Timestamp atual para auditoria.
+
+    const updated: Activity = {                             -> Monta o objeto final com campos atualizados.
+      ...activity,                                          -> Copia campos recebidos (imutabilidade).
+      atualizadoEm: now,                                    -> Atualiza timestamp de atualização.
+      criadoEm: idx >= 0 ? items[idx].criadoEm : now,       -> Preserva criadoEm se já existia; senão, define agora.
+    };
+
+    if (idx >= 0) items[idx] = updated; else items.push(updated); -> Substitui (update) ou adiciona (insert).
+    items.sort(sortByPriorityThenDueDate);                  -> Reordena sempre após upsert.
+    this.state$.next([...items]);                           -> Emite uma cópia (evita mutações externas).
+  }
+
+  remove(id: string): void {                                -> Remove atividade por id.
+    const next = this.state$.getValue().filter(i => i.id !== id); -> Filtra a lista.
+    this.state$.next(next);                                 -> Emite a nova lista.
+  }
+
+  toggleDone(id: string): void {                            -> Alterna status de conclusão.
+    const items = this.state$.getValue().map(i =>           -> Mapeia para criar uma nova lista (imutável).
+      i.id === id ? { ...i, concluida: !i.concluida, atualizadoEm: new Date() } : i
+    );
+    this.state$.next(items);                                -> Emite a lista com item atualizado.
+  }
+}                                                           -> Fim do serviço.
+
+7.5) components/activity-list.component.ts — Componente de lista (standalone)
+(código)
+import { Component } from '@angular/core';                     -> Decorator de componente.
+import { Observable } from 'rxjs';                             -> Usaremos Observable no template.
+import { Activity } from '../shared/models/activity';          -> Tipo Activity para tipagem no componente.
+import { ActivityService } from '../shared/services/activity.service'; -> Serviço de atividades.
+
+@Component({
+  selector: 'app-activity-list',                               -> Seletor do componente.
+  standalone: true,                                            -> Componente standalone (sem NgModule).
+  template: `
+    <h2>Atividades</h2>
+    <ul>
+      <li *ngFor="let a of (activities$ | async)">
+        <strong>[{{a.prioridade}}]</strong> {{a.titulo}}
+        <span *ngIf="a.prazo"> - prazo: {{a.prazo | date:'shortDate'}}</span>
+        <button (click)="onToggleDone(a.id)">{{ a.concluida ? 'Reabrir' : 'Concluir' }}</button>
+        <button (click)="onRemove(a.id)">Remover</button>
+      </li>
+    </ul>
+  `                                                         -> Template inline simples (poderia ser arquivo .html).
+})
+export class ActivityListComponent {
+  activities$: Observable<Activity[]> = this.activityService.list(); -> Stream reativo para o template (| async).
+  constructor(private activityService: ActivityService) {}           -> Injeta o serviço.
+
+  onToggleDone(id: string) { this.activityService.toggleDone(id); }  -> Encaminha ação de alternar status ao serviço.
+  onRemove(id: string)     { this.activityService.remove(id); }      -> Encaminha remoção ao serviço.
+}                                                                     -> Fim do componente.
+
+8) Porquês importantes (prontos para responder ao professor)
+- Enum com pesos numéricos (Priority): facilita ordenação direta e comparações sem mapeamentos extras.
+- Ordenação composta (prioridade > prazo): expressa bem a urgência (importância e temporalidade).
+- BehaviorSubject no serviço: fornece o último valor + atualizações; perfeito para componentes com | async.
+- Emissão imutável (spread [...items]): previne mutações acidentais e bugs de detecção de mudanças.
+- Tipagem forte (interfaces/enums): reduz erros e auto-documenta o domínio.
+- Validações sugeridas: impedir criação com título vazio; normalizar strings; não aceitar prazo no passado.
+
+9) Dicas de apresentação (duas pessoas)
+- Pessoa A (Infra/Angular):
+  - Explicar main.ts (bootstrap), app.config.ts (providers/roteador), app.routes.ts (roteamento).
+  - AppComponent: standalone, imports, template, styleUrls; por que usar RouterOutlet.
+  - Testes do AppComponent: TestBed, imports, asserções.
+- Pessoa B (Domínio: Prioridades/Atividades):
+  - Models (Priority, Activity): campos e decisões (por que concluida, por que timestamps).
+  - Ordenação (sortByPriorityThenDueDate): regra de negócio e casos de empate.
+  - Serviço (ActivityService): BehaviorSubject, upsert imutável, ordenação após mutação, toggleDone.
+  - Componente de lista: uso de | async, handlers delegando ao serviço.
+FIM
+
+10) Pipes de Apresentação (labels e cores)
+10.1) utils/priority-label.pipe.ts — Exibe rótulo legível
+(código)
+import { Pipe, PipeTransform } from '@angular/core';           -> Importa APIs para criar Pipe.
+import { Priority } from '../models/priority';                 -> Enum de prioridade.
+
+@Pipe({ name: 'priorityLabel', standalone: true })             -> Declara pipe standalone.
+export class PriorityLabelPipe implements PipeTransform {      -> Classe do pipe.
+  transform(value: Priority): string {                         -> Implementa transformação.
+    switch (value) {                                           -> Escolhe rótulo por enum.
+      case Priority.Alta:  return 'Alta';
+      case Priority.Media: return 'Média';
+      case Priority.Baixa: return 'Baixa';
+      default:            return 'Desconhecida';
+    }
+  }
+}                                                              -> Fim do pipe.
+(explicação)
+- Use no template: {{ a.prioridade | priorityLabel }} para rótulo em PT-BR.
+
+10.2) utils/priority-color.ts — Mapeamento de cores
+(código)
+import { Priority } from '../models/priority';                -> Enum de prioridade.
+
+export function priorityColor(p: Priority): string {          -> Função auxiliar.
+  switch (p) {                                                -> Retorna cor CSS por prioridade.
+    case Priority.Alta:  return '#d32f2f';   // vermelho
+    case Priority.Media: return '#f9a825';   // amarelo
+    case Priority.Baixa: return '#388e3c';   // verde
+    default:             return '#757575';   // cinza
+  }
+}
+(explicação)
+- Útil para badges/estilos dinâmicos sem acoplar lógica no template.
+
+11) Validações e Regras de Negócio
+11.1) validators/activity.validators.ts — Regras básicas
+(código)
+import { Activity } from '../models/activity';                   -> Tipagem.
+export function isTitleValid(t: string): boolean {               -> Título não vazio.
+  return !!t && t.trim().length >= 3;
+}
+export function isDueDateValid(d?: Date): boolean {               -> Prazo no futuro (se informado).
+  if (!d) return true;
+  return new Date(d).getTime() >= new Date().setHours(0,0,0,0);
+}
+export function normalizeActivity(a: Activity): Activity {        -> Normalizações.
+  return {
+    ...a,
+    titulo: a.titulo.trim(),
+    descricao: a.descricao?.trim(),
+  };
+}
+(explicação)
+- Centraliza validações; facilita testes e reuso no formulário/serviço.
+
+11.2) Integração no serviço (trecho)
+(código)
+import { isTitleValid, isDueDateValid, normalizeActivity } from '../validators/activity.validators'; -> Importa validações.
+
+upsert(activity: Activity): void {
+  const normalized = normalizeActivity(activity);                 -> Normaliza strings.
+  if (!isTitleValid(normalized.titulo)) {                         -> Valida título.
+    throw new Error('Título inválido (mín. 3 caracteres).');
+  }
+  if (!isDueDateValid(normalized.prazo)) {                        -> Valida prazo.
+    throw new Error('Prazo não pode ser no passado.');
+  }
+  // ... segue upsert com 'normalized' em vez de 'activity'
+}
+(explicação)
+- Regras de negócio aplicadas antes de alterar estado.
+
+12) Persistência Local (localStorage)
+12.1) services/storage.service.ts — Wrapper simples
+(código)
+import { Injectable } from '@angular/core';                          -> Serviço injetável.
+
+@Injectable({ providedIn: 'root' })
+export class StorageService {
+  get<T>(key: string): T | null {                                    -> Lê JSON do localStorage.
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) as T : null;
+  }
+  set<T>(key: string, value: T): void {                              -> Grava JSON.
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+  remove(key: string): void { localStorage.removeItem(key); }        -> Remove chave.
+}
+(explicação)
+- Abstrai localStorage; facilita troca por IndexedDB ou outro storage depois.
+
+12.2) Persistindo Activities (serialização de datas)
+(código)
+const KEY = 'activities';
+
+constructor(private storage: StorageService) {                       -> Injeta StorageService.
+  const data = this.storage.get<any[]>(KEY) ?? [];                   -> Carrega dados iniciais.
+  const parsed = data.map(d => ({                                    -> Reconstrói datas.
+    ...d,
+    criadoEm: d.criadoEm ? new Date(d.criadoEm) : new Date(),
+    atualizadoEm: d.atualizadoEm ? new Date(d.atualizadoEm) : undefined,
+    prazo: d.prazo ? new Date(d.prazo) : undefined,
+  }));
+  this.state$.next(parsed.sort(sortByPriorityThenDueDate));          -> Ordena e emite.
+}
+
+private persist(): void {
+  const items = this.state$.getValue().map(i => ({                   -> Serializa para JSON (datas viram ISO strings).
+    ...i,
+  }));
+  this.storage.set(KEY, items);                                      -> Salva.
+}
+
+upsert(a: Activity): void {
+  // ... lógica existente
+  this.persist();                                                    -> Persiste após mudança.
+}
+remove(id: string): void { /* ... */ this.persist(); }               -> Persiste após remoção.
+toggleDone(id: string): void { /* ... */ this.persist(); }           -> Persiste após toggle.
+(explicação)
+- Garante durabilidade entre recarregamentos do app.
+
+13) Persistência HTTP (evolução)
+13.1) services/activity-http.service.ts — Esqueleto
+(código)
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
+import { Activity } from '../models/activity';
+
+@Injectable({ providedIn: 'root' })
+export class ActivityHttpService {
+  private readonly base = '/api/activities';                         -> Endpoint base (ajustar conforme backend).
+
+  constructor(private http: HttpClient) {}
+
+  list(): Observable<Activity[]> {
+    return this.http.get<Activity[]>(this.base).pipe(
+      map(items => items.map(i => ({                                 -> Reconstrói datas se necessário.
+        ...i,
+        criadoEm: new Date(i.criadoEm),
+        atualizadoEm: i.atualizadoEm ? new Date(i.atualizadoEm) : undefined,
+        prazo: i.prazo ? new Date(i.prazo) : undefined,
+      })))
+    );
+  }
+
+  upsert(a: Activity): Observable<Activity> {
+    return this.http.put<Activity>(`${this.base}/${a.id}`, a);
+  }
+
+  remove(id: string) { return this.http.delete<void>(`${this.base}/${id}`); }
+}
+(explicação)
+- Troca fácil do serviço em memória para um baseado em HTTP mantendo a mesma interface reativa.
+
+14) Formulário de Atividade (Reactive Forms)
+14.1) components/activity-form.component.ts — Criação/edição
+(código)
+import { Component, inject } from '@angular/core';                    -> Decorator e API inject (standalone).
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms'; -> Reactive Forms.
+import { Priority } from '../shared/models/priority';                 -> Enum Priority.
+import { ActivityService } from '../shared/services/activity.service'; -> Serviço de domínio.
+import { v4 as uuid } from 'uuid';                                    -> Geração de id (ex.: via uuid).
+
+@Component({
+  selector: 'app-activity-form',
+  standalone: true,
+  imports: [ReactiveFormsModule],
+  template: `
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <input formControlName="titulo" placeholder="Título" />
+      <textarea formControlName="descricao" placeholder="Descrição"></textarea>
+      <select formControlName="prioridade">
+        <option [value]="Priority.Alta">Alta</option>
+        <option [value]="Priority.Media">Média</option>
+        <option [value]="Priority.Baixa">Baixa</option>
+      </select>
+      <input type="date" formControlName="prazo" />
+      <button type="submit" [disabled]="form.invalid">Salvar</button>
+    </form>
+  `
+})
+export class ActivityFormComponent {
+  readonly Priority = Priority;                                       -> Exposto para template.
+  private fb = inject(FormBuilder);                                    -> Injeta FormBuilder.
+  private activityService = inject(ActivityService);                   -> Injeta serviço.
+
+  form = this.fb.group({
+    titulo: ['', [Validators.required, Validators.minLength(3)]],      -> Validações do título.
+    descricao: [''],
+    prioridade: [Priority.Media, [Validators.required]],               -> Valor padrão: Média.
+    prazo: [null],                                                     -> Prazo opcional.
+  });
+
+  onSubmit() {
+    if (this.form.invalid) return;                                     -> Guarda contra envio inválido.
+    const v = this.form.value;                                         -> Obtém valores do form.
+    const prazo = v.prazo ? new Date(v.prazo as any) : undefined;      -> Converte input date para Date.
+    this.activityService.upsert({
+      id: uuid(),
+      titulo: v.titulo!,
+      descricao: v.descricao ?? undefined,
+      prioridade: v.prioridade!,
+      concluida: false,
+      prazo,
+      criadoEm: new Date(),
+      atualizadoEm: new Date(),
+    });
+    this.form.reset({ prioridade: Priority.Media });                   -> Limpa o formulário.
+  }
+}
+(explicação)
+- Validações no frontend e conversão de datas do input HTML.
+- Integra-se ao serviço reativo; UI atualiza automaticamente.
+
+15) Testes (exemplos)
+15.1) utils/priority-sort.spec.ts — Teste da ordenação
+(código)
+import { sortByPriorityThenDueDate } from './priority-sort';
+import { Priority } from '../models/priority';
+const a = (p: Priority, d?: string) => ({ prioridade: p, prazo: d ? new Date(d) : undefined } as any);
+
+describe('sortByPriorityThenDueDate', () => {
+  it('ordena por prioridade desc', () => {
+    const xs = [a(Priority.Baixa), a(Priority.Alta), a(Priority.Media)];
+    xs.sort(sortByPriorityThenDueDate);
+    expect(xs.map(x => x.prioridade)).toEqual([Priority.Alta, Priority.Media, Priority.Baixa]);
+  });
+
+  it('desempata por prazo mais próximo', () => {
+    const xs = [a(Priority.Media, '2099-12-01'), a(Priority.Media, '2099-01-01')];
+    xs.sort(sortByPriorityThenDueDate);
+    expect(xs[0].prazo!.getTime()).toBeLessThan(xs[1].prazo!.getTime());
+  });
+});
+(explicação)
+- Garante a lógica de ordenação em cenários de prioridade e empate por prazo.
+
+15.2) services/activity.service.spec.ts — Teste do serviço
+(código)
+import { ActivityService } from './activity.service';
+import { Priority } from '../models/priority';
+import { firstValueFrom } from 'rxjs';
+
+describe('ActivityService', () => {
+  it('upsert adiciona e ordena', async () => {
+    const s = new ActivityService();
+    s.upsert({ id: '1', titulo: 'A', prioridade: Priority.Baixa, concluida: false, criadoEm: new Date() });
+    s.upsert({ id: '2', titulo: 'B', prioridade: Priority.Alta, concluida: false, criadoEm: new Date() });
+    const xs = await firstValueFrom(s.list());
+    expect(xs[0].id).toBe('2'); // Alta vem primeiro
+  });
+
+  it('toggleDone alterna concluida', async () => {
+    const s = new ActivityService();
+    s.upsert({ id: '1', titulo: 'A', prioridade: Priority.Baixa, concluida: false, criadoEm: new Date() });
+    s.toggleDone('1');
+    const xs = await firstValueFrom(s.list());
+    expect(xs[0].concluida).toBeTrue();
+  });
+});
+(explicação)
+- Verifica ordenação após upsert e alternância de status.
+
+16) Roteamento Avançado (guards e lazy)
+16.1) app.routes.ts (trecho com rota de atividades)
+(código)
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  { path: '', redirectTo: 'atividades', pathMatch: 'full' },          -> Redireciona para lista de atividades.
+  { path: 'atividades', loadComponent: () => import('./features/activity-list.component').then(m => m.ActivityListComponent) }, -> Lazy load de componente standalone.
+  { path: '**', redirectTo: 'atividades' }                            -> Rota coringa.
+];
+(explicação)
+- Usa loadComponent para lazy; melhora performance inicial.
+
+16.2) guards/unsaved-changes.guard.ts — Guard de página
+(código)
+import { CanDeactivateFn } from '@angular/router';
+
+export const unsavedChangesGuard: CanDeactivateFn<{ hasUnsaved: () => boolean }> =
+  (component) => {
+    if (component.hasUnsaved?.()) {
+      return confirm('Existem alterações não salvas. Deseja sair?');
+    }
+    return true;
+  };
+(explicação)
+- Protege formulários contra navegação acidental; interface leve baseada em método do componente.
+
+17) Interceptor HTTP (tratamento de erro)
+17.1) interceptors/http-error.interceptor.ts
+(código)
+import { HttpInterceptorFn } from '@angular/common/http';
+
+export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
+  return next(req).pipe(
+    // import { catchError } from 'rxjs/operators';
+    // catchError(err => { console.error('HTTP error', err); return throwError(() => err); })
+  );
+};
+(explicação)
+- Interceptor funcional (Angular moderno); ponto central para logging e mapeamento de erros.
+
+18) Performance e Detecção de Mudanças
+(código)
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+
+@Component({
+  // ...
+  changeDetection: ChangeDetectionStrategy.OnPush             -> OnPush reduz verificações de mudança.
+})
+export class ActivityListComponent {
+  trackById = (_: number, a: Activity) => a.id;              -> trackBy para *ngFor evita recriação de DOM.
+}
+(explicação)
+- OnPush + trackBy melhoram performance em listas grandes.
+
+19) Complexidade e Escalabilidade
+- upsert: O(n) para findIndex + O(n log n) para sort em cada alteração; para muitas operações, considere:
+  - Inserção ordenada sem resort completo (inserir já no lugar certo) → O(n) sem o custo do sort total.
+  - Estruturas como heaps ou trees se o conjunto for muito grande e mutações frequentes.
+- remove/toggle: O(n) pelo map/filter. Com dados médios de UI, é suficiente.
+- Persistência: batch updates (debounceTime) para evitar writes frequentes no storage/HTTP.
+
+20) Possíveis perguntas do professor (e respostas)
+- Por que enum numérico para prioridade?
+  -> Ordenação direta (b.prioridade - a.prioridade) e menos conversões.
+- Por que BehaviorSubject e não Subject?
+  -> Último valor sempre disponível, necessário para templates com | async.
+- Como evitar mutação acidental?
+  -> Emitindo cópias (spread) e não expondo o Subject diretamente, apenas Observable.
+- Como tratar prazos sem valor?
+  -> Usamos Infinity para empurrar para o fim em desempate de prazo.
+- Como internacionalizar rótulos?
+  -> Pipe de label pode ser trocado por i18n; ou mapa de traduções por idioma.
+
+21) Glossário rápido
+- Standalone component: componente Angular sem precisar de NgModule.
+- Provider: registro de dependência na injeção (DI).
+- Guard: função/classe que decide navegação.
+- Interceptor: intercepta requisições/respostas HTTP.
+- BehaviorSubject: subject RxJS com valor corrente.
+
+22) Checklist final de revisão
+- Lógica de ordenação atende ao requisito do professor? (prioridade > prazo)
+- Validações aplicadas no serviço e no formulário.
+- Persistência local/HTTP conforme a necessidade.
+- Testes para ordenação e serviço.
+- Apresentação dividida entre infra e domínio.
