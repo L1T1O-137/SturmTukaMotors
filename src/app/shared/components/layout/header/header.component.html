@@ -1,17 +1,17 @@
 <header class="header" [class.dark-mode]="isDarkMode">
     <div class="logo-container">
         <a routerLink="/" class="logo-link d-flex align-items-center gap-2" style="text-decoration: none;">
-            <img src="assets/imgs/logo.jpeg" alt="Logo" class="logo-image" (error)="handleImageError($event)">
+            <img src="assets/imgs/logo.jpeg" alt="Logo" class="logo-image" (error)="handleImageError($event)"><!--Garantia da imagem-->
             <h1 class="logo-text">Sturm&Stuka Motors</h1>
         </a>
     </div>
 
     <nav class="navigation" [class.active]="isMenuOpen" role="navigation">
         <ul class="nav-list">
-            <li *ngFor="let item of menuItems" class="nav-item">
+            <li *ngFor="let item of menuItems" class="nav-item"> <!--Ele puxa os itens do menuItems e cria no header-->
                 <a [routerLink]="item.link" routerLinkActive="active" class="nav-link"
                     (click)="handleNavClick($event, item)">
-                    {{item.label}}
+                    {{item.label}} <!--Aqui ele puxa nome-->
                 </a>
             </li>
         </ul>

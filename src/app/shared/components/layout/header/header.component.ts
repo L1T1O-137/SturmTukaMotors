@@ -40,7 +40,7 @@ export class HeaderComponent implements OnInit {
     imgElement.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
   }
 
-  toggleMenu(): void {
+  MostraMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 

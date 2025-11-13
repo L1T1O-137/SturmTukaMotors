@@ -17,7 +17,7 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('Possa criar', () => {
     expect(component).toBeTruthy();
   });
 });
