@@ -29,7 +29,6 @@ export class ListarAtividadesComponent implements OnInit {
 
   constructor(
     private atividadeService: AtividadeService,
-    private funcionarioService: FuncionarioService,
     private router: Router,
     private produtoServicoService: ProdutoServicoService,
     private produtoService: ProdutoService
@@ -40,7 +39,6 @@ export class ListarAtividadesComponent implements OnInit {
   }
 
   async load(): Promise<void> {
-    this.funcionarios = await this.funcionarioService.getAllFuncionarios();
     this.atividades = await this.atividadeService.getAllAtividades();
     this.applyFilters();
   }
@@ -85,7 +83,7 @@ export class ListarAtividadesComponent implements OnInit {
       this.processingIds.delete(a.id);
       return;
     }
-    
+
     // Carrega associações produto<-quantidade do serviço
     const assoc = await this.produtoServicoService.getAssociacoesByServicoId(a.servicoId);
     if (!assoc || assoc.length === 0) {
