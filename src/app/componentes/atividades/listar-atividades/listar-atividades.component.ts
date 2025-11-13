@@ -25,7 +25,6 @@ export class ListarAtividadesComponent implements OnInit {
   private processingIds = new Set<number>();
 
   filtroCategoria: CategoriaAtividade | 'Todas' = 'Todas';
-  filtroFuncionarioId: number | 'Todos' = 'Todos';
 
 
   constructor(
