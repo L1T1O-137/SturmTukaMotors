@@ -85,34 +85,7 @@ export class ListarAtividadesComponent implements OnInit {
       this.processingIds.delete(a.id);
       return;
     }
-    if (a.dataFim) {
-      const res = await Swal.fire({
-        icon: 'question',
-        title: 'Atividade já concluída',
-        text: 'Esta atividade já possui data de fim. Deseja reaplicar a baixa no estoque mesmo assim?',
-        showCancelButton: true,
-        confirmButtonText: 'Reaplicar',
-        cancelButtonText: 'Cancelar'
-      });
-      if (!res.isConfirmed) {
-        this.processingIds.delete(a.id);
-        return;
-      }
-    } else {
-      const ok = await Swal.fire({
-        icon: 'question',
-        title: 'Concluir atividade?',
-        text: 'Ao concluir, será dada baixa no estoque conforme os produtos associados ao serviço.',
-        showCancelButton: true,
-        confirmButtonText: 'Concluir',
-        cancelButtonText: 'Cancelar'
-      });
-      if (!ok.isConfirmed) {
-        this.processingIds.delete(a.id);
-        return;
-      }
-    }
-
+    
     // Carrega associações produto<-quantidade do serviço
     const assoc = await this.produtoServicoService.getAssociacoesByServicoId(a.servicoId);
     if (!assoc || assoc.length === 0) {
