@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 
@@ -17,9 +17,8 @@ interface MenuItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   isMenuOpen = false;
-  isDarkMode = false;
   menuItems: MenuItem[] = [
     { label: 'Início', link: '/' },
     { label: 'Serviços', link: '/servicos' },
@@ -27,34 +26,25 @@ export class HeaderComponent implements OnInit {
     { label: 'Fornecedores', link: '/fornecedores' },
     { label: 'Atividades', link: '/atividades/listar-atividades' },
     { label: 'Estoque', link: '/estoque' },
-    { label: 'Suporte', link: '/suporte' }
   ];
 
-  ngOnInit(): void {
-    this.checkPreferredTheme();
-  }
-
+  // Método chamado quando a imagem do logo falha ao carregar
   handleImageError(event: Event): void {
-    const imgElement = event.target as HTMLImageElement;
-    // Fallback para um pixel transparente para evitar loops de erro
+    const imgElement = event.target as HTMLImageElement; // Converte o target do evento para HTMLImageElement
+    // Define um pixel transparente  como fallback para evitar loops infinitos de erro
+    // Se o fallback também falhasse, não geraria outro evento de erro
     imgElement.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
   }
 
+  // Alterna a visibilidade do menu mobile (abre/fecha)
   MostraMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
+    this.isMenuOpen = !this.isMenuOpen; // Inverte o valor booleano: true vira false e vice-versa
   }
 
+  // Gerencia o clique em um item do menu de navegação
   handleNavClick(event: Event, item: MenuItem): void {
-    this.menuItems.forEach(menuItem => menuItem.active = false);
-    item.active = true;
+    this.menuItems.forEach(menuItem => menuItem.active = false); // Remove a marcação 'active' de todos os itens
+    item.active = true; // Marca apenas o item clicado como ativo
   }
 
-  private checkPreferredTheme(): void {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      this.isDarkMode = savedTheme === "dark";
-    } else {
-      this.isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-  }
 }

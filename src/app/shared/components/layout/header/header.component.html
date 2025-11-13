@@ -1,10 +1,13 @@
-<header class="header" [class.dark-mode]="isDarkMode">
+<header class="header">
     <div class="logo-container">
         <a routerLink="/" class="logo-link d-flex align-items-center gap-2" style="text-decoration: none;">
-            <img src="assets/imgs/logo.jpeg" alt="Logo" class="logo-image" (error)="handleImageError($event)"><!--Garantia da imagem-->
+            <img src="assets/imgs/logo.jpeg" alt="Logo" class="logo-image"
+                (error)="handleImageError($event)"><!-- Se a imagem falhar ao carregar, o evento (error) chama handleImageError($event) para definir um fallback -->
             <h1 class="logo-text">Sturm&Stuka Motors</h1>
         </a>
     </div>
+    
+<!-- Fallback é um plano B,usado quando o recurso principal falha -->
 
     <nav class="navigation" [class.active]="isMenuOpen" role="navigation">
         <ul class="nav-list">
