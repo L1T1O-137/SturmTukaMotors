@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Atividade, CategoriaAtividade } from '../../../modelos/atividade.model';
+import { Atividade, CategoriaAtividade, Prioridade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ProdutoServicoService } from '../../../services/produto-servico.service';
@@ -19,12 +19,14 @@ export class ListarAtividadesComponent implements OnInit {
   atividades: Atividade[] = [];
   filtered: Atividade[] = [];
   categorias = Object.values(CategoriaAtividade);
+  prioridades = Object.values(Prioridade);
   funcionarios: any[] = [];
 
   // Controle visual
   private processingIds = new Set<number>();
 
   filtroCategoria: CategoriaAtividade | 'Todas' = 'Todas';
+  filtroPrioridade: Prioridade | 'Todas' = 'Todas';
 
 
   constructor(
@@ -46,8 +48,19 @@ export class ListarAtividadesComponent implements OnInit {
   applyFilters(): void {
     this.filtered = this.atividades.filter(a => {
       const categoriaMatch = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
-      return categoriaMatch;
+      const prioridadeMatch = this.filtroPrioridade === 'Todas' || a.prioridade === this.filtroPrioridade;
+      return categoriaMatch && prioridadeMatch;
     });
+  }
+
+  priorityClass(p?: Prioridade): string {
+    switch (p) {
+      case Prioridade.Urgente: return 'badge text-bg-danger';
+      case Prioridade.Alta: return 'badge text-bg-warning text-dark';
+      case Prioridade.Media: return 'badge text-bg-info text-dark';
+      case Prioridade.Baixa: return 'badge text-bg-secondary';
+      default: return 'badge text-bg-light text-dark';
+    }
   }
 
   addAtividade(): void {

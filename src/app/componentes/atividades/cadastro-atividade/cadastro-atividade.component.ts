@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoriaAtividade, Atividade } from '../../../modelos/atividade.model';
+import { CategoriaAtividade, Atividade, Prioridade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
 import { ServicoService } from '../../../services/servico.service';
 import { ClienteService } from '../../../services/cliente.service';
@@ -17,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class CadastroAtividadeComponent implements OnInit {
   categorias = Object.values(CategoriaAtividade);
+  prioridades = Object.values(Prioridade);
 
   servicos: any[] = [];
   clientes: any[] = [];
@@ -31,6 +32,7 @@ export class CadastroAtividadeComponent implements OnInit {
     dataInicio: ['', Validators.required],
     dataFim: [''],
     categoria: [CategoriaAtividade.Manutencao, Validators.required],
+    prioridade: [Prioridade.Media, Validators.required],
     servicoId: [null],
     clienteId: [null],
   });
@@ -62,6 +64,7 @@ export class CadastroAtividadeComponent implements OnInit {
             dataInicio: atividade.dataInicio,
             dataFim: atividade.dataFim || '',
             categoria: atividade.categoria,
+            prioridade: atividade.prioridade || Prioridade.Media,
             servicoId: (atividade.servicoId as any) ?? null,
             clienteId: (atividade.clienteId as any) ?? null,
           });
@@ -80,6 +83,7 @@ export class CadastroAtividadeComponent implements OnInit {
       dataInicio: v.dataInicio!,
       dataFim: v.dataFim || undefined,
       categoria: v.categoria!,
+      prioridade: v.prioridade!,
       servicoId: v.servicoId || undefined,
       clienteId: v.clienteId || undefined,
     };

@@ -2,12 +2,19 @@
   <div class="row col-md-12">
     <h1 class="text-center my-4">Atividades</h1>
 
-    <div class="d-flex justify-content-center mb-3">
-      <div class="col-md-4">
+    <div class="d-flex justify-content-center mb-3 gap-3">
+      <div class="col-md-3">
         <label class="form-label">Categoria</label>
         <select class="form-select" (change)="filtroCategoria = $any($event.target).value; applyFilters()">
           <option value="Todas">Todas</option>
           <option *ngFor="let c of categorias" [value]="c">{{c}}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Prioridade</label>
+        <select class="form-select" (change)="filtroPrioridade = $any($event.target).value; applyFilters()">
+          <option value="Todas">Todas</option>
+          <option *ngFor="let p of prioridades" [value]="p">{{p}}</option>
         </select>
       </div>
     </div>
@@ -26,6 +33,7 @@
                   <h5 class="card-title text-truncate mb-1">{{a.nome}}</h5>
                   <div class="d-flex gap-1">
                     <span class="badge text-bg-secondary">{{a.categoria}}</span>
+                    <span [ngClass]="priorityClass(a.prioridade)">{{a.prioridade || '—'}}</span>
                   </div>
                 </div>
                 <p class="card-text" style="min-height:3em">{{a.descricao}}</p>

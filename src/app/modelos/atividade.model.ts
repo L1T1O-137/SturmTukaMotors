@@ -14,6 +14,14 @@ export interface Atividade {
   dataInicio: string; // ISO data string
   dataFim?: string;   // ISO data string
   categoria: CategoriaAtividade;
-  servicoId?: number;      // vínculo ao serviço (opcional)
-  clienteId?: number;      // vínculo ao cliente (opcional)
+  prioridade?: Prioridade;
+  servicoId?: number;      
+  clienteId?: number;      
+}
+
+export enum Prioridade {
+  Baixa = 'Baixa',
+  Media = 'Média',
+  Alta = 'Alta',
+  Urgente = 'Urgente'
 }
