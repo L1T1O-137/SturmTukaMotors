@@ -22,7 +22,7 @@ export class HeaderComponent {
   menuItems: MenuItem[] = [
     { label: 'Início', link: '/' },
     { label: 'Serviços', link: '/servicos' },
-    { label: 'Clientes', link: '/clientes/listar-clientes' },
+    { label: 'Clientes', link: '/clientes' },
     { label: 'Fornecedores', link: '/fornecedores' },
     { label: 'Atividades', link: '/atividades/listar-atividades' },
     { label: 'Estoque', link: '/estoque' },

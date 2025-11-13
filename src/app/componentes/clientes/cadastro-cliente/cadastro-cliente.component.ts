@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Cliente } from '../../../modelos/cliente.model';
 import { ClienteService } from '../../../services/cliente.service';
@@ -12,10 +12,13 @@ import Swal from 'sweetalert2';
   templateUrl: './cadastro-cliente.component.html',
   styleUrls: ['./cadastro-cliente.component.css']
 })
-export class CadastroClienteComponent implements OnInit {
+export class CadastroClienteComponent implements OnInit, OnChanges {
   clientes: Cliente[] = [];
   fotoPreviewUrl: string | ArrayBuffer | null = null;
   private clienteId?: number;
+  @Input() clienteEdit?: Cliente;
+  @Output() saved = new EventEmitter<void>();
+  @Output() cancelEdit = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
 
@@ -56,6 +59,28 @@ export class CadastroClienteComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['clienteEdit']) {
+      const c: Cliente | undefined = changes['clienteEdit'].currentValue;
+      if (c && c.id != null) {
+        this.clienteId = c.id;
+        this.formCliente.patchValue({
+          nome: c.nome,
+          fone: c.fone,
+          email: c.email ?? '',
+          fotoUrl: (c as any).fotoUrl ?? '',
+          endereco: (c as any).endereco ?? '',
+          cpf: (c as any).cpf ?? ''
+        });
+        this.fotoPreviewUrl = (c as any).fotoUrl ?? null;
+      } else {
+        this.clienteId = undefined;
+        this.formCliente.reset();
+        this.fotoPreviewUrl = null;
+      }
+    }
+  }
+
   addCliente() {
     if (this.formCliente.invalid) return;
 
@@ -82,12 +107,11 @@ export class CadastroClienteComponent implements OnInit {
       });
       this.formCliente.reset();
       this.fotoPreviewUrl = null;
-      if (this.clienteId) {
-        // Após atualizar, voltar para a listagem
-        this.router.navigate(['/clientes/listar-clientes']);
-      }
+      this.saved.emit();
     });
   }
+
+  cancelar() { this.cancelEdit.emit(); }
 
   onFileSelected(event: Event): void {
     const element = event.target as HTMLInputElement;

@@ -1,10 +1,6 @@
 <div class="container">
-  @if(clientes.length > 0){
     <div class="row col-md-12">
       <h1 class="text-center my-4">Clientes Cadastrados</h1>
-      <div class="d-grid gap-2 d-md-block mb-3">
-        <button class="btn btn-primary" type="button" (click)="addCliente()">Novo Cliente</button>
-      </div>
       @for(cliente of clientes; track cliente.id){
         <div class="col-sm-6 col-md-4 col-lg-3 my-3">
           <div class="card h-100 shadow-sm position-relative">
@@ -30,10 +26,4 @@
         </div>
       }
     </div>
-  } @else {
-    <div class="row"><h1 class="text-center">Nenhum Cliente Cadastrado</h1></div>
-    <div class="col-md-6 offset-md-3 text-center">
-      <button class="btn btn-primary" (click)="addCliente()">Cadastrar Cliente</button>
-    </div>
-  }
 </div>

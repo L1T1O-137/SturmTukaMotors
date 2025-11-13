@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Cliente } from '../../../modelos/cliente.model';
 import { ClienteService } from '../../../services/cliente.service';
@@ -14,6 +14,9 @@ import Swal from 'sweetalert2';
 })
 export class ListarClientesComponent implements OnInit {
   clientes: Cliente[] = [];
+  @Output() editar = new EventEmitter<Cliente>();
+  @Output() removed = new EventEmitter<void>();
+  @Output() novo = new EventEmitter<void>();
 
   constructor(private clienteService: ClienteService, private router: Router) {}
 
@@ -25,12 +28,14 @@ export class ListarClientesComponent implements OnInit {
     this.clientes = await this.clienteService.getAllClientes();
   }
 
-  addCliente(): void {
-    this.router.navigate(['/clientes/cadastro-cliente']);
-  }
+  addCliente(): void { this.novo.emit(); }
 
   editCliente(id: number): void {
-    this.router.navigate(['/clientes/editar-cliente', id]);
+    const cliente = this.clientes.find(c => c.id === id);
+    if (cliente) {
+      this.editar.emit(cliente);
+      this.router.navigate(['/clientes/editar-cliente', id]);
+    }
   }
 
   deleteCliente(id: number): void {
@@ -45,6 +50,7 @@ export class ListarClientesComponent implements OnInit {
       if (result.isConfirmed) {
         await this.clienteService.deleteCliente(id);
         await this.loadClientes();
+        this.removed.emit();
         Swal.fire({ icon: 'success', title: 'Removido!', timer: 2500, showConfirmButton: false });
       }
     });

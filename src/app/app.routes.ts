@@ -5,8 +5,7 @@ import { ListarProdutosFornecedorComponent } from './componentes/fornecedores/li
 import { FornecedoresComponent } from './componentes/fornecedores/fornecedores.component';
 import { ServicosComponent } from './componentes/servicos/servicos.component';
 import { AssociacaoProdutosServicoComponent } from './componentes/servicos/associacao-produtos-servico/associacao-produtos-servico.component';
-import { CadastroClienteComponent } from './componentes/clientes/cadastro-cliente/cadastro-cliente.component';
-import { ListarClientesComponent } from './componentes/clientes/listar-clientes/listar-clientes.component';
+import { ClientesComponent } from './componentes/clientes/clientes.component';
 import { CadastroAtividadeComponent } from './componentes/atividades/cadastro-atividade/cadastro-atividade.component';
 import { ListarAtividadesComponent } from './componentes/atividades/listar-atividades/listar-atividades.component';
 
@@ -18,9 +17,7 @@ export const routes: Routes = [
     { path: 'servico/:id/produtos', component: AssociacaoProdutosServicoComponent },
     { path: 'fornecedor/:id/produtos', component: ListarProdutosFornecedorComponent },
     { path: 'estoque', component: EstoqueComponent },
-    { path: 'clientes/cadastro-cliente', component: CadastroClienteComponent },
-    { path: 'clientes/editar-cliente/:id', component: CadastroClienteComponent },
-    { path: 'clientes/listar-clientes', component: ListarClientesComponent },
+    { path: 'clientes', component: ClientesComponent },
     { path: 'atividades/cadastro-atividade', component: CadastroAtividadeComponent },
     { path: 'atividades/editar-atividade/:id', component: CadastroAtividadeComponent },
     { path: 'atividades/listar-atividades', component: ListarAtividadesComponent },
