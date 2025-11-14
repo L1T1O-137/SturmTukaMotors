@@ -19,10 +19,6 @@
       </div>
     </div>
 
-    <div class="d-grid gap-2 d-md-block mb-2">
-      <button class="btn btn-primary" type="button" (click)="addAtividade()">Nova Atividade</button>
-    </div>
-
     @if(filtered.length > 0){
       <div class="row">
         @for(a of filtered; track a.id){

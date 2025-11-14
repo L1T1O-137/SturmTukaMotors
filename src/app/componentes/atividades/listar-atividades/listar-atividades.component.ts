@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Atividade, CategoriaAtividade, Prioridade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
@@ -21,6 +21,10 @@ export class ListarAtividadesComponent implements OnInit {
   categorias = Object.values(CategoriaAtividade);
   prioridades = Object.values(Prioridade);
   funcionarios: any[] = [];
+
+  @Output() editar = new EventEmitter<Atividade>();
+  @Output() removed = new EventEmitter<void>();
+  @Output() novo = new EventEmitter<void>();
 
   // Controle visual
   private processingIds = new Set<number>();
@@ -64,11 +68,14 @@ export class ListarAtividadesComponent implements OnInit {
   }
 
   addAtividade(): void {
-    this.router.navigate(['/atividades/cadastro-atividade']);
+    this.novo.emit();
   }
 
   editAtividade(id: number): void {
-    this.router.navigate(['/atividades/editar-atividade', id]);
+    const atividade = this.atividades.find(a => a.id === id);
+    if (atividade) {
+      this.editar.emit(atividade);
+    }
   }
 
   async deleteAtividade(id: number): Promise<void> {
@@ -83,6 +90,7 @@ export class ListarAtividadesComponent implements OnInit {
     if (result.isConfirmed) {
       await this.atividadeService.deleteAtividade(id);
       await this.load();
+      this.removed.emit();
       Swal.fire({ icon: 'success', title: 'Removida!', timer: 2200, showConfirmButton: false });
     }
   }
