@@ -59,7 +59,8 @@
 
       <div class="mb-3">
         <button class="btn btn-primary" type="submit" [disabled]="formAtividade.invalid">Salvar</button>
-        <button type="reset" class="ms-2 btn btn-outline-secondary">Limpar</button>
+        <button type="button" class="ms-2 btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+        <button type="reset" class="ms-2 btn btn-light border">Limpar</button>
       </div>
     </form>
   </div>

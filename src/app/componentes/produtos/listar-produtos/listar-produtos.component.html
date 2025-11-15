@@ -9,7 +9,6 @@
                     <th scope="col" class="text-center">Nome</th>
                     <th scope="col" class="text-center">Preço</th>
                     <th scope="col" class="text-center">Quantidade</th>
-                    <th scope="col" class="text-center">Fornecedor</th>
                     <th scope="col" class="text-center">Ações</th>
                 </tr>
             </thead>
@@ -20,7 +19,6 @@
                     <td>{{ produto.nome }}</td>
                     <td class="text-center">{{ produto.preco | currency:'BRL' }}</td>
                     <td class="text-center">{{ produto.quantidade }}</td>
-                    <td class="text-center">{{ produto.nomeFornecedor }}</td>
                     <td class="text-center">
                         <button class="btn btn-sm btn-outline-primary me-2" (click)="onEditar(produto)">
                             <i class="bi bi-pencil-square"></i>

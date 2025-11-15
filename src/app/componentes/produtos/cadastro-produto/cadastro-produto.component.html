@@ -60,27 +60,7 @@
           <div class="form-text text-danger">Quantidade é obrigatória.</div>
         }
       </div>
-
-      <!-- Fornecedor -->
-      <div class="mb-3">
-        <label for="fornecedorId" class="form-label">Fornecedor:</label>
-        <select 
-          class="form-select" 
-          formControlName="fornecedorId" 
-          id="fornecedorId"
-          aria-label="Fornecedor" 
-          required
-        >
-          <option [value]="null" disabled selected>Selecione um fornecedor</option>
-          @for(fornecedor of fornecedores; track fornecedor.id){
-            <option [value]="fornecedor.id">
-              {{ fornecedor.nome }} - {{ fornecedor.cpf }} - {{ fornecedor.fone }}
-            </option>
-          }
-        </select>
-        <div class="form-text">Selecione o fornecedor para o produto.</div>
-      </div>
-
+      
       <button type="submit" class="btn btn-primary" [disabled]="formProduto.invalid">
         {{ editMode ? 'Atualizar' : 'Salvar' }}
       </button>

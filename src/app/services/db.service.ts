@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { Fornecedor } from '../modelos/fornecedor.model';
 import { Cliente } from '../modelos/cliente.model';
 import { Produto } from '../modelos/produto.model';
 import { Servico } from '../modelos/servico.model';
@@ -10,7 +9,6 @@ import { Atividade, Prioridade } from '../modelos/atividade.model';
 
 @Injectable({ providedIn: 'root' })
 export class DbService extends Dexie {
-  fornecedores!: Table<Fornecedor, number>;
   clientes!: Table<Cliente, number>; // Tabela de clientes
   produtos!: Table<Produto, number>; // Tabela de produtos
   servicos!: Table<Servico, number>; // Tabela de serviços
@@ -33,10 +31,10 @@ export class DbService extends Dexie {
     // v7: Removido índice em prioridade de atividades
     // v8: adicionada propriedade 'prioridade' às atividades e ajustado schema
     // v9: migração para popular campo 'prioridade' em atividades existentes
-  this.version(9).stores({
-      fornecedores: '++id, nome, cpf, fone',
+    // v10: removido fornecedorId de produtos
+  this.version(10).stores({
       clientes: '++id, nome, cpf, fone, email, fotoUrl, endereco',
-      produtos: '++id, nome, preco, quantidade, fornecedorId',
+      produtos: '++id, nome, preco, quantidade',
       servicos: '++id, nome, descricao, preco',
       produtosServico: '[servicoId+produtoId], servicoId, produtoId, quantidade',
       funcionarios: '++id, nome, fone, email, fotoUrl, funcao, dataAdmissao',

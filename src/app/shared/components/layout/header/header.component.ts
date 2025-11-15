@@ -23,7 +23,6 @@ export class HeaderComponent {
     { label: 'Início', link: '/' },
     { label: 'Serviços', link: '/servicos' },
     { label: 'Clientes', link: '/clientes' },
-    { label: 'Fornecedores', link: '/fornecedores' },
     { label: 'Atividades', link: '/atividades/listar-atividades' },
     { label: 'Estoque', link: '/estoque' },
   ];

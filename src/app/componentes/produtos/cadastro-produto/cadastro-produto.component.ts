@@ -1,10 +1,8 @@
-import { Component, inject, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Produto } from '../../../modelos/produto.model';
 import { ProdutoService } from '../../../services/produto.service';
-import { Fornecedor } from '../../../modelos/fornecedor.model';
-import { FornecedorService } from '../../../services/fornecedor.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -13,7 +11,7 @@ import Swal from 'sweetalert2';
   templateUrl: './cadastro-produto.component.html',
   styleUrl: './cadastro-produto.component.css'
 })
-export class CadastroProdutoComponent implements OnInit, OnChanges {
+export class CadastroProdutoComponent implements OnChanges {
   // FormBuilder injetado para construção do formulário reativo
   private fb = inject(FormBuilder);
   
@@ -22,11 +20,9 @@ export class CadastroProdutoComponent implements OnInit, OnChanges {
     nome: ['', Validators.required],
     preco: [null as number | null, Validators.required],
     quantidade: [null as number | null, Validators.required],
-    fornecedorId: [null as number | null, Validators.required]
+
   });
 
-  // Lista de fornecedores carregada no init para popular o select
-  fornecedores: Fornecedor[] = [];
 
   // Produto em edição recebido do pai (Estoque); se presente entra em modo edição
   @Input() produtoEdit?: Produto;
@@ -37,12 +33,8 @@ export class CadastroProdutoComponent implements OnInit, OnChanges {
 
   constructor(
     private produtoService: ProdutoService,
-    private fornecedorService: FornecedorService
   ) {}
 
-  ngOnInit() {
-    this.loadFornecedores();
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     // Quando um produto para edição chega, preenche o formulário
@@ -51,7 +43,7 @@ export class CadastroProdutoComponent implements OnInit, OnChanges {
         nome: this.produtoEdit.nome,
         preco: this.produtoEdit.preco,
         quantidade: this.produtoEdit.quantidade,
-        fornecedorId: this.produtoEdit.fornecedorId
+
       });
     }
     // Se foi removido (undefined), reseta form para modo criação
@@ -64,13 +56,6 @@ export class CadastroProdutoComponent implements OnInit, OnChanges {
     return !!this.produtoEdit?.id;
   }
 
-  /** Carrega todos fornecedores disponíveis para o select */
-  loadFornecedores() {
-    this.fornecedorService.getAllFornecedores().then(fornecedores => {
-      this.fornecedores = fornecedores;
-    });
-  }
-
   /** Cria ou atualiza produto dependendo do modo */
   addProduto() {
     if (!this.formProduto.valid) return;
@@ -78,9 +63,7 @@ export class CadastroProdutoComponent implements OnInit, OnChanges {
     const baseProduto = new Produto(
       this.formProduto.value.nome!,
       Number(this.formProduto.value.preco!),
-      Number(this.formProduto.value.quantidade!),
-      Number(this.formProduto.value.fornecedorId!)
-    );
+      Number(this.formProduto.value.quantidade!));
     // Se estamos editando, preserva o id original
     if (this.editMode) {
       baseProduto.id = this.produtoEdit!.id;
