@@ -40,10 +40,4 @@ export class HeaderComponent {
     this.isMenuOpen = !this.isMenuOpen; // Inverte o valor booleano: true vira false e vice-versa
   }
 
-  // Gerencia o clique em um item do menu de navegação
-  handleNavClick(event: Event, item: MenuItem): void {
-    this.menuItems.forEach(menuItem => menuItem.active = false); // Remove a marcação 'active' de todos os itens
-    item.active = true; // Marca apenas o item clicado como ativo
-  }
-
 }
