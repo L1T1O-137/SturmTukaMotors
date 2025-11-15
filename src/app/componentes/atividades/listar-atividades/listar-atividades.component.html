@@ -5,14 +5,14 @@
     <div class="d-flex justify-content-center mb-3 gap-3">
       <div class="col-md-3">
         <label class="form-label">Categoria</label>
-        <select class="form-select" (change)="filtroCategoria = $any($event.target).value; applyFilters()">
+        <select class="form-select" (change)="filtroCategoria = $any($event.target).value; aplicarFiltros()">
           <option value="Todas">Todas</option>
           <option *ngFor="let c of categorias" [value]="c">{{c}}</option>
         </select>
       </div>
       <div class="col-md-3">
         <label class="form-label">Prioridade</label>
-        <select class="form-select" (change)="filtroPrioridade = $any($event.target).value; applyFilters()">
+        <select class="form-select" (change)="filtroPrioridade = $any($event.target).value; aplicarFiltros()">
           <option value="Todas">Todas</option>
           <option *ngFor="let p of prioridades" [value]="p">{{p}}</option>
         </select>
@@ -29,7 +29,7 @@
                   <h5 class="card-title text-truncate mb-1">{{a.nome}}</h5>
                   <div class="d-flex gap-1">
                     <span class="badge text-bg-secondary">{{a.categoria}}</span>
-                    <span [ngClass]="priorityClass(a.prioridade)">{{a.prioridade || '—'}}</span>
+                    <span [ngClass]="obterClassePrioridade(a.prioridade)">{{a.prioridade || '—'}}</span>
                   </div>
                 </div>
                 <p class="card-text" style="min-height:3em">{{a.descricao}}</p>
@@ -38,8 +38,9 @@
                   <span *ngIf="a.dataFim"> | Fim: {{a.dataFim | date:'dd/MM/y'}}</span>
                 </p>
                 <div class="mt-auto d-flex justify-content-end flex-wrap gap-2">
-                  <button class="btn btn-sm btn-outline-primary" (click)="editAtividade(a.id!)" title="Editar">Editar</button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="deleteAtividade(a.id!)" title="Remover">Remover</button>
+                  <button class="btn btn-sm btn-success" (click)="concluirAtividade(a)" title="Concluir e dar baixa no estoque"><i class="bi bi-check-circle"></i> Concluir</button>
+                  <button class="btn btn-sm btn-outline-primary" (click)="editarAtividade(a.id!)" title="Editar">Editar</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="removerAtividade(a.id!)" title="Remover">Remover</button>
                 </div>
               </div>
             </div>

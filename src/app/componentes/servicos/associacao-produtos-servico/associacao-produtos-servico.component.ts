@@ -93,7 +93,23 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
     };
     // Atualiza quantidade local e persiste no IndexedDB
     this.quantidades.set(this.produtoIdSelecionado, this.qtdeProduto);
-    this.produtoServicoService.updateProdutoServico(novaAssociacao);
+    this.produtoServicoService.updateProdutoServico(novaAssociacao).then(() => {
+      console.log('Associação salva:', novaAssociacao);
+      Swal.fire({
+        icon: 'success',
+        title: 'Produto associado!',
+        text: `Quantidade: ${this.qtdeProduto}`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }).catch(err => {
+      console.error('Erro ao salvar associação:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro ao associar',
+        text: 'Tente novamente.'
+      });
+    });
   }
 
   dropped(event: CdkDragDrop<Produto[]>, isConcluded: boolean) {
@@ -150,6 +166,25 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
       this.quantidades.set(pid, novaQtd);
       const assoc: ProdutoServico = { servicoId: this.servicoId, produtoId: pid, quantidade: novaQtd };
       await this.produtoServicoService.updateProdutoServico(assoc);
+    }
+  }
+
+  async verificarAssociacoes(): Promise<void> {
+    const assoc = await this.produtoServicoService.getAssociacoesByServicoId(this.servicoId);
+    console.log('Associações no banco para serviço', this.servicoId, ':', assoc);
+    if (assoc.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Nenhuma associação',
+        text: 'Não há produtos associados salvos no banco de dados.'
+      });
+    } else {
+      const lista = assoc.map(a => `Produto ID ${a.produtoId}: ${a.quantidade} unidades`).join('<br>');
+      Swal.fire({
+        icon: 'info',
+        title: `${assoc.length} associação(ões) encontrada(s)`,
+        html: lista
+      });
     }
   }
 }

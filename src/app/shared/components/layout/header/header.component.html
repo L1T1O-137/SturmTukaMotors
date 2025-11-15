@@ -5,7 +5,7 @@
         </a>
     </div>
 
-    <nav class="navigation" [class.active]="isMenuOpen" role="navigation">
+    <nav class="navigation" role="navigation">
         <ul class="nav-list">
             <li *ngFor="let item of menuItems" class="nav-item"> <!--Ele puxa os itens do menuItems e cria no header-->
                 <a [routerLink]="item.link" routerLinkActive="active"

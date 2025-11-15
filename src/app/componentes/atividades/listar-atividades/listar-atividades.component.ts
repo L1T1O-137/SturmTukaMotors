@@ -3,7 +3,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Atividade, CategoriaAtividade, Prioridade } from '../../../modelos/atividade.model';
 import { AtividadeService } from '../../../services/atividade.service';
-import { FuncionarioService } from '../../../services/funcionario.service';
+
 import { ProdutoServicoService } from '../../../services/produto-servico.service';
 import { ProdutoService } from '../../../services/produto.service';
 import Swal from 'sweetalert2';
@@ -17,20 +17,21 @@ import Swal from 'sweetalert2';
 })
 export class ListarAtividadesComponent implements OnInit {
   atividades: Atividade[] = [];
-  filtered: Atividade[] = [];
+  filtered: Atividade[] = []; // Lista filtrada que será exibida na tela
   categorias = Object.values(CategoriaAtividade);
   prioridades = Object.values(Prioridade);
-  funcionarios: any[] = [];
 
+  // Eventos emitidos para o componente pai (hub)
   @Output() editar = new EventEmitter<Atividade>();
-  @Output() removed = new EventEmitter<void>();
+  @Output() removido = new EventEmitter<void>();
   @Output() novo = new EventEmitter<void>();
 
-  // Controle visual
-  private processingIds = new Set<number>();
-
+  // Filtros aplicados à listagem
   filtroCategoria: CategoriaAtividade | 'Todas' = 'Todas';
   filtroPrioridade: Prioridade | 'Todas' = 'Todas';
+
+  // Controle para evitar cliques duplicados no botão de concluir
+  private processandoIds = new Set<number>();
 
 
   constructor(
@@ -41,15 +42,17 @@ export class ListarAtividadesComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    await this.carregarAtividades();
   }
 
-  async load(): Promise<void> {
+  async carregarAtividades(): Promise<void> {
+    // Busca todas as atividades do banco de dados
     this.atividades = await this.atividadeService.getAllAtividades();
-    this.applyFilters();
+    this.aplicarFiltros();
   }
 
-  applyFilters(): void {
+  aplicarFiltros(): void {
+    // Filtra atividades com base nos filtros selecionados
     this.filtered = this.atividades.filter(a => {
       const categoriaMatch = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
       const prioridadeMatch = this.filtroPrioridade === 'Todas' || a.prioridade === this.filtroPrioridade;
@@ -57,8 +60,9 @@ export class ListarAtividadesComponent implements OnInit {
     });
   }
 
-  priorityClass(p?: Prioridade): string {
-    switch (p) {
+  obterClassePrioridade(prioridade?: Prioridade): string {
+    // Retorna a classe CSS apropriada para cada nível de prioridade
+    switch (prioridade) {
       case Prioridade.Urgente: return 'badge text-bg-danger';
       case Prioridade.Alta: return 'badge text-bg-warning text-dark';
       case Prioridade.Media: return 'badge text-bg-info text-dark';
@@ -67,19 +71,19 @@ export class ListarAtividadesComponent implements OnInit {
     }
   }
 
-  addAtividade(): void {
+  adicionarAtividade(): void {
     this.novo.emit();
   }
 
-  editAtividade(id: number): void {
+  editarAtividade(id: number): void {
     const atividade = this.atividades.find(a => a.id === id);
     if (atividade) {
       this.editar.emit(atividade);
     }
   }
 
-  async deleteAtividade(id: number): Promise<void> {
-    const result = await Swal.fire({
+  async removerAtividade(id: number): Promise<void> {
+    const resultado = await Swal.fire({
       title: 'Remover atividade?',
       text: 'Esta ação não poderá ser desfeita.',
       icon: 'warning',
@@ -87,54 +91,97 @@ export class ListarAtividadesComponent implements OnInit {
       confirmButtonText: 'Sim, remover',
       cancelButtonText: 'Cancelar'
     });
-    if (result.isConfirmed) {
+    
+    if (resultado.isConfirmed) {
       await this.atividadeService.deleteAtividade(id);
-      await this.load();
-      this.removed.emit();
+      await this.carregarAtividades();
+      this.removido.emit();
       Swal.fire({ icon: 'success', title: 'Removida!', timer: 2200, showConfirmButton: false });
     }
   }
 
-  async concluirAtividade(a: Atividade): Promise<void> {
-    if (!a.id) return;
-    if (this.processingIds.has(a.id)) return;
-    this.processingIds.add(a.id);
-    if (!a.servicoId) {
-      await Swal.fire({ icon: 'info', title: 'Sem serviço associado', text: 'Associe um serviço à atividade para concluir e dar baixa no estoque.' });
-      this.processingIds.delete(a.id);
+  // Método para concluir atividade e dar baixa no estoque
+  async concluirAtividade(atividade: Atividade): Promise<void> {
+    console.log('Tentando concluir atividade:', atividade);
+    
+    // Valida se a atividade existe e não está sendo processada
+    if (!atividade.id || this.processandoIds.has(atividade.id)) return;
+    
+    // Adiciona ao conjunto de IDs em processamento para evitar cliques duplicados
+    this.processandoIds.add(atividade.id);
+    
+    console.log('servicoId da atividade:', atividade.servicoId, 'tipo:', typeof atividade.servicoId);
+    
+    // Verifica se a atividade possui um serviço associado
+    if (!atividade.servicoId) {
+      await Swal.fire({ 
+        icon: 'info', 
+        title: 'Sem serviço associado', 
+        text: 'Associe um serviço à atividade para concluir e dar baixa no estoque.' 
+      });
+      this.processandoIds.delete(atividade.id);
       return;
     }
 
-    // Carrega associações produto<-quantidade do serviço
-    const assoc = await this.produtoServicoService.getAssociacoesByServicoId(a.servicoId);
-    if (!assoc || assoc.length === 0) {
-      await Swal.fire({ icon: 'info', title: 'Nenhum produto associado', text: 'Não há produtos associados a este serviço.' });
-      this.processingIds.delete(a.id);
+    console.log('Buscando associações para servicoId:', atividade.servicoId);
+    
+    // Busca todas as associações de produtos vinculadas ao serviço
+    const associacoes = await this.produtoServicoService.getAssociacoesByServicoId(atividade.servicoId);
+    console.log('Associações encontradas:', associacoes);
+    
+    // Verifica se há produtos associados ao serviço
+    if (!associacoes || associacoes.length === 0) {
+      await Swal.fire({ 
+        icon: 'info', 
+        title: 'Nenhum produto associado', 
+        html: `Não há produtos associados ao serviço ID ${atividade.servicoId}.<br>Vá em Serviços → selecione o serviço → Associar Produtos.` 
+      });
+      this.processandoIds.delete(atividade.id);
       return;
     }
 
-    // Valida estoque suficiente
-    const produtos = await Promise.all(assoc.map(as => this.produtoService.getProdutoById(as.produtoId)));
-    const faltantes = assoc.filter((as, idx) => {
-      const p = produtos[idx];
-      return !p || p.quantidade < as.quantidade;
+    // Carrega os dados completos de cada produto associado
+    const produtos = await Promise.all(
+      associacoes.map(assoc => this.produtoService.getProdutoById(assoc.produtoId))
+    );
+    
+    // Verifica se todos os produtos possuem estoque suficiente
+    const produtosSemEstoque = associacoes.filter((assoc, index) => {
+      const produto = produtos[index];
+      return !produto || produto.quantidade < assoc.quantidade;
     });
-    if (faltantes.length > 0) {
+    
+    if (produtosSemEstoque.length > 0) {
       await Swal.fire({
         icon: 'error',
         title: 'Estoque insuficiente',
-        html: 'Um ou mais produtos não possuem quantidade suficiente para a baixa. Ajuste o estoque ou a quantidade associada e tente novamente.'
+        text: 'Um ou mais produtos não possuem quantidade suficiente para a baixa. Ajuste o estoque ou a quantidade associada.'
       });
-      this.processingIds.delete(a.id);
+      this.processandoIds.delete(atividade.id);
       return;
     }
 
-    // Aplica baixa
-    await Promise.all(assoc.map(async (as, idx) => {
-      const p = produtos[idx]!;
-      p.quantidade = p.quantidade - as.quantidade;
-      await this.produtoService.updateProduto(p);
-    }));
+    // Aplica a baixa no estoque de cada produto
+    await Promise.all(
+      associacoes.map(async (assoc, index) => {
+        const produto = produtos[index]!; // Produto correspondente à associação
+        produto.quantidade -= assoc.quantidade; // Subtrai a quantidade usada
+        await this.produtoService.updateProduto(produto); // Atualiza no banco de dados
+      })
+    );
+    // O await é importante para garantir que todas as atualizações sejam concluídas antes de prosseguir
+
+    // Exibe mensagem de sucesso
+    await Swal.fire({
+      icon: 'success',
+      title: 'Atividade concluída!',
+      text: 'Baixa no estoque realizada com sucesso.',
+      timer: 2500,
+      showConfirmButton: false
+    });
+
+    // Remove do conjunto de processamento e recarrega a lista
+    this.processandoIds.delete(atividade.id);
+    await this.carregarAtividades();
   }
 }
-

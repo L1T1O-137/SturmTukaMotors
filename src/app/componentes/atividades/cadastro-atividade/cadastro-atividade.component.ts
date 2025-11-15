@@ -21,7 +21,7 @@ export class CadastroAtividadeComponent implements OnInit {
 
   servicos: any[] = [];
   clientes: any[] = [];
-  funcionarios: any[] = [];
+
   atividadeId?: number;
   @Input() atividadeEdit?: Atividade;
   @Output() saved = new EventEmitter<void>();
@@ -102,9 +102,11 @@ export class CadastroAtividadeComponent implements OnInit {
       dataFim: v.dataFim || undefined,
       categoria: v.categoria!,
       prioridade: v.prioridade!,
-      servicoId: v.servicoId || undefined,
-      clienteId: v.clienteId || undefined,
+      servicoId: v.servicoId ? Number(v.servicoId) : undefined, // conversão para number
+      clienteId: v.clienteId ? Number(v.clienteId) : undefined, // conversão para number
     };
+
+    console.log('Salvando atividade:', atividade); // Log para debug
 
     const op = this.atividadeId ? this.atividadeService.updateAtividade(atividade) : this.atividadeService.addAtividade(atividade);
     op.then(() => {
@@ -123,7 +125,7 @@ export class CadastroAtividadeComponent implements OnInit {
       }
     });
   }
-
+  //funcionou graças a deus
   cancelar(): void {
     if (this.cancelEdit.observers.length > 0) {
       this.cancelEdit.emit();
