@@ -42,6 +42,6 @@ export class AtividadesComponent implements OnInit {
   selecionarAba(aba: 'listagem' | 'cadastro') { this.abaAtiva = aba; }
 
   novaAtividade() { this.atividadeSelecionada = undefined; this.selecionarAba('cadastro'); }
-  onSaved() { this.atividadeSelecionada = undefined; this.selecionarAba('listagem'); this.listarComp?.load(); }
-  onRemoved() { this.listarComp?.load(); }
+  onSaved() { this.atividadeSelecionada = undefined; this.selecionarAba('listagem'); this.listarComp?.carregarAtividades(); }
+  onRemoved() { this.listarComp?.carregarAtividades(); }
 }
