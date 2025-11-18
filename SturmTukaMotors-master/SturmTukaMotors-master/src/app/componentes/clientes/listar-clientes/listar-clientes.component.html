@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="row col-md-12">
+      @for(cliente of clientes; track cliente.id){
+        <div class="col-sm-6 col-md-4 col-lg-3 my-3">
+          <div class="card h-100 shadow-sm position-relative">
+            <img [src]="cliente.fotoUrl" class="card-img-top mx-auto mt-3 rounded-circle foto-cliente"
+                 alt="Foto de {{ cliente.nome }}" (click)="abrirModalImagem(cliente)">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-center text-truncate mb-1">{{ cliente.nome }}</h5>
+              <p class="card-text text-muted mb-2 text-truncate">
+                <i class="bi bi-envelope-fill me-1"></i>{{ cliente.email }}
+              </p>
+              <p class="card-text text-muted mb-2">
+                <i class="bi bi-phone-fill me-1"></i>{{ cliente.fone }}
+              </p>
+              <p class="card-text mb-2 text-truncate">
+                <i class="bi bi-house-fill me-1"></i>{{ cliente.endereco }}
+              </p>
+              <div class="mt-auto position-absolute top-0 end-0 pt-2 pe-2">
+                <i class="bi bi-pen edit-icon" (click)="editCliente(cliente.id!)" title="Editar"></i>
+                <i class="bi bi-trash ms-2 text-danger" (click)="deleteCliente(cliente.id!)" title="Remover"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+</div>

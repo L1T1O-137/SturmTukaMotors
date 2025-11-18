@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="col-md-6 offset-md-3">
+        <form [formGroup]="formCliente" (ngSubmit)="addCliente()" class="mb-5">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" class="form-control" id="nome" formControlName="nome" required />
+            </div>
+            <div class="mb-3">
+                <label for="fone" class="form-label">Telefone:</label>
+                <input type="text" class="form-control" id="fone" formControlName="fone" required />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail:</label>
+                <input type="email" class="form-control" id="email" formControlName="email" required />
+            </div>
+            <div class="mb-3">
+                <label for="endereco" class="form-label">Endereço:</label>
+                <input type="text" class="form-control" id="endereco" formControlName="endereco" required />
+            </div>
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF (opcional):</label>
+                <input type="text" class="form-control" id="cpf" formControlName="cpf" />
+            </div>
+            <div class="mb-3">
+                <label for="fotoInput" class="form-label">Foto:</label>
+                <input type="file" id="fotoInput" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+            </div>
+            @if(fotoPreviewUrl){
+                <div class="mb-3 text-center">
+                    <img [src]="fotoPreviewUrl" alt="Pré-visualização da Foto" class="img-thumbnail"
+                             style="max-width: 150px; max-height: 150px; object-fit: cover;">
+                </div>
+            }
+            @if(formCliente.invalid){
+                <div class="form-text text-danger mb-3">Preencha todos os campos obrigatórios.</div>
+            } @else {
+                <div class="form-text text-success mb-3">Campos obrigatórios preenchidos.</div>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="formCliente.invalid">Salvar</button>
+            <button type="button" class="ms-2 btn btn-danger" (click)="cancelar()">Cancelar</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+.listas {
+  display: flex;
+  gap: 20px;
+}
+.lista {
+  width: 90%;
+  min-height: 300px;
+  border: 2px dashed #ccc;
+  padding: 10px;
+  background: #f9f9f9;
+  margin: 0 auto;
+}
+.item {
+  padding: 10px;
+  margin: 5px 0;
+  background: white;
+  border: 1px solid #ddd;
+  cursor: move;
+}

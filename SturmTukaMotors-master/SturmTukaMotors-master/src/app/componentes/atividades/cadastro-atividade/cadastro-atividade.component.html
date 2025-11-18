@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="col-md-8 offset-md-2">
+    <h1 class="text-center">Cadastrar Atividade</h1>
+    <form [formGroup]="formAtividade" (ngSubmit)="submit()" class="mb-5">
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Nome</label>
+          <input type="text" class="form-control" formControlName="nome" required>
+        </div>
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" formControlName="categoria">
+            <option *ngFor="let c of categorias" [value]="c">{{c}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descrição</label>
+        <textarea rows="3" class="form-control" formControlName="descricao" required></textarea>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Data de início</label>
+          <input type="date" class="form-control" formControlName="dataInicio" required>
+        </div>
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Data de fim (opcional)</label>
+          <input type="date" class="form-control" formControlName="dataFim">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Serviço</label>
+          <select class="form-select" formControlName="servicoId">
+            <option [ngValue]="null">Selecione...</option>
+            <option *ngFor="let s of servicos" [value]="s.id">{{s.nome}}</option>
+          </select>
+        </div>
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Cliente</label>
+          <select class="form-select" formControlName="clienteId">
+            <option [ngValue]="null">Selecione...</option>
+            <option *ngFor="let c of clientes" [value]="c.id">{{c.nome}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Prioridade</label>
+          <select class="form-select" formControlName="prioridade">
+            <option *ngFor="let p of prioridades" [value]="p">{{p}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <button class="btn btn-primary" type="submit" [disabled]="formAtividade.invalid">Salvar</button>
+        <button type="button" class="ms-2 btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+        <button type="reset" class="ms-2 btn btn-light border">Limpar</button>
+      </div>
+    </form>
+  </div>
+</div>

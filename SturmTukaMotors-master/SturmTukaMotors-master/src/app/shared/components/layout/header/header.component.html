@@ -1,0 +1,18 @@
+<header class="header">
+    <div class="logo-container">
+        <a routerLink="/" class="logo-link d-flex align-items-center gap-2" style="text-decoration: none;">
+            <h1 class="logo-text">Sturm&Stuka Motors</h1>
+        </a>
+    </div>
+
+    <nav class="navigation" role="navigation">
+        <ul class="nav-list">
+            <li *ngFor="let item of menuItems" class="nav-item"> 
+                <a [routerLink]="item.link" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: item.link === '/' }" class="nav-link">
+                    {{item.label}} 
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>

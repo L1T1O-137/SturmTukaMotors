@@ -1,0 +1,24 @@
+
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding-top: 70px; /* offset fix for fixed header height */
+	background-color: #f8f9fa;
+	font-family: system-ui, Arial, sans-serif;
+}
+
+
+.with-header {
+	padding-top: 70px;
+}
+
+
+html {
+	scroll-behavior: smooth;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
