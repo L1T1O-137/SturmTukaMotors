@@ -2,6 +2,27 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
 
+## 📚 Aprendendo Angular / Learning Angular
+
+**Novo para Angular? Comece aqui!** / **New to Angular? Start here!**
+
+Este projeto inclui um guia completo em português explicando os conceitos básicos do Angular. Para aprender os fundamentos do framework, veja:
+
+👉 **[ANGULAR_BASICS.md](./ANGULAR_BASICS.md)** - Guia Básico do Angular em Português
+
+O guia cobre:
+- O que é Angular e suas principais características
+- Componentes, Templates e Data Binding
+- Diretivas (estruturais e de atributo)
+- Serviços e Injeção de Dependência
+- Roteamento e Navegação
+- Standalone Components (Angular moderno)
+- Formulários (Template-Driven e Reactive)
+- Observables e RxJS
+- Boas práticas e muito mais!
+
+---
+
 ## Development server
 
 To start a local development server, run:
