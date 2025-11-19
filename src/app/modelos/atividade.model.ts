@@ -11,12 +11,12 @@ export interface Atividade {
   id?: number;
   nome: string;
   descricao: string;
-  dataInicio: string; // ISO data string
-  dataFim?: string;   // ISO data string
+  dataInicio: string;
+  dataFim?: string;
   categoria: CategoriaAtividade;
   prioridade?: Prioridade;
-  servicoId?: number;      
-  clienteId?: number;      
+  servicoId?: number;
+  clienteId?: number;
 }
 
 export enum Prioridade {

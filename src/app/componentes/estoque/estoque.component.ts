@@ -11,24 +11,19 @@ import { Produto } from '../../modelos/produto.model';
   styleUrl: './estoque.component.css'
 })
 export class EstoqueComponent {
-  // Controla qual aba está ativa (cadastro ou listagem)
   abaAtiva: 'cadastro' | 'listagem' = 'listagem';
-  // Referência ao componente de listagem para forçar reload quando necessário
   @ViewChild(ListarProdutosComponent) listarComp?: ListarProdutosComponent;
-  // Produto selecionado para edição
   produtoSelecionado: Produto | undefined;
 
   selecionarAba(aba: 'cadastro' | 'listagem') {
     this.abaAtiva = aba;
   }
 
-  // Acionada ao clicar em editar na lista
   onEditar(produto: Produto) {
     this.produtoSelecionado = produto;
     this.selecionarAba('cadastro');
   }
 
-  // Após salvar (criar ou atualizar), volta para listagem e recarrega
   onSaved() {
     this.produtoSelecionado = undefined;
     this.selecionarAba('listagem');

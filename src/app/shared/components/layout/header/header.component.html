@@ -1,4 +1,4 @@
-<header class="header">
+﻿<header class="header">
     <div class="logo-container">
         <a routerLink="/" class="logo-link d-flex align-items-center gap-2" style="text-decoration: none;">
             <h1 class="logo-text">Sturm&Stuka Motors</h1>
@@ -7,11 +7,11 @@
 
     <nav class="navigation" role="navigation">
         <ul class="nav-list">
-            <li *ngFor="let item of menuItems" class="nav-item"> <!--Ele puxa os itens do menuItems e cria no header-->
+            <li *ngFor="let item of menuItems" class="nav-item"> 
                 <a [routerLink]="item.link" routerLinkActive="active"
                     [routerLinkActiveOptions]="{ exact: item.link === '/' }" class="nav-link">
-                    <!-- [routerLink]: navega; routerLinkActive="active": aplica classe quando ativo; routerLinkActiveOptions exact p/ '/' evita "Início" ativo em outras rotas -->
-                    {{item.label}} <!--Aqui ele puxa nome-->
+                    
+                    {{item.label}} 
                 </a>
             </li>
         </ul>

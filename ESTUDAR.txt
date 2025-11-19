@@ -1,13 +1,3 @@
-TÍTULO: SturmTukaMotors — Explicação linha a linha (TypeScript) com foco em prioridades e atividades
-
-1) Visão geral
-- Framework: Angular (arquivos angular.json, tsconfig, estrutura src/app).
-- Arquivos TS principais detectados:
-  - src/main.ts
-  - src/app/app.config.ts
-  - src/app/app.routes.ts
-  - src/app/app.component.ts
-  - src/app/app.component.spec.ts
 
 2) src/main.ts — Bootstrap da aplicação (exemplo típico + explicação)
 (código)

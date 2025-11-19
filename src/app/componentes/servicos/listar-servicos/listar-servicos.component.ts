@@ -31,10 +31,8 @@ export class ListarServicosComponent implements OnInit {
   }
 
   onEditar(servico: Servico) {
-    // Emit for hub usage and also allow deep link navigation pattern
     this.editar.emit(servico);
     if (servico.id != null) {
-      // Update URL to reflect editing state (optional, does not reload component due to hub route)
       this.router.navigate(['/servicos/editar-servico', servico.id]);
     }
   }

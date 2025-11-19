@@ -21,11 +21,9 @@ export class ProdutoServicoService {
   }
 
   async addMultiplosProdutosServicoAssociacoes(associations: ProdutoServico[]): Promise<[number, number][]> {
-    // Dexie bulkPut returns keys; for compound keys, cast to tuple
     return db.produtosServico.bulkPut(associations) as unknown as Promise<[number, number][]>;
   }
 
-  // Futuras operações de associação podem ser adicionadas aqui
   addProdutoServico(rel: ProdutoServico) {
     return db.produtosServico.add(rel);
   }

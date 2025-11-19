@@ -1,4 +1,4 @@
-.parent {
+﻿.parent {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: repeat(10, 1fr);
@@ -20,7 +20,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* cobre toda a área mantendo proporção */
+    
     display: block;
 }
 

@@ -17,20 +17,17 @@ import Swal from 'sweetalert2';
 })
 export class ListarAtividadesComponent implements OnInit {
   atividades: Atividade[] = [];
-  filtered: Atividade[] = []; // Lista filtrada que será exibida na tela
+  filtered: Atividade[] = [];
   categorias = Object.values(CategoriaAtividade);
   prioridades = Object.values(Prioridade);
 
-  // Eventos emitidos para o componente pai (hub)
   @Output() editar = new EventEmitter<Atividade>();
   @Output() removido = new EventEmitter<void>();
   @Output() novo = new EventEmitter<void>();
 
-  // Filtros aplicados à listagem
   filtroCategoria: CategoriaAtividade | 'Todas' = 'Todas';
   filtroPrioridade: Prioridade | 'Todas' = 'Todas';
 
-  // Controle para evitar cliques duplicados no botão de concluir
   private processandoIds = new Set<number>();
 
 
@@ -46,13 +43,11 @@ export class ListarAtividadesComponent implements OnInit {
   }
 
   async carregarAtividades(): Promise<void> {
-    // Busca todas as atividades do banco de dados
     this.atividades = await this.atividadeService.getAllAtividades();
     this.aplicarFiltros();
   }
 
   aplicarFiltros(): void {
-    // Filtra atividades com base nos filtros selecionados
     this.filtered = this.atividades.filter(a => {
       const categoriaMatch = this.filtroCategoria === 'Todas' || a.categoria === this.filtroCategoria;
       const prioridadeMatch = this.filtroPrioridade === 'Todas' || a.prioridade === this.filtroPrioridade;
@@ -61,7 +56,6 @@ export class ListarAtividadesComponent implements OnInit {
   }
 
   obterClassePrioridade(prioridade?: Prioridade): string {
-    // Retorna a classe CSS apropriada para cada nível de prioridade
     switch (prioridade) {
       case Prioridade.Urgente: return 'badge text-bg-danger';
       case Prioridade.Alta: return 'badge text-bg-warning text-dark';
@@ -100,19 +94,15 @@ export class ListarAtividadesComponent implements OnInit {
     }
   }
 
-  // Método para concluir atividade e dar baixa no estoque
   async concluirAtividade(atividade: Atividade): Promise<void> {
     console.log('Tentando concluir atividade:', atividade);
     
-    // Valida se a atividade existe e não está sendo processada
     if (!atividade.id || this.processandoIds.has(atividade.id)) return;
     
-    // Adiciona ao conjunto de IDs em processamento para evitar cliques duplicados
     this.processandoIds.add(atividade.id);
     
     console.log('servicoId da atividade:', atividade.servicoId, 'tipo:', typeof atividade.servicoId);
     
-    // Verifica se a atividade possui um serviço associado
     if (!atividade.servicoId) {
       await Swal.fire({ 
         icon: 'info', 
@@ -125,11 +115,9 @@ export class ListarAtividadesComponent implements OnInit {
 
     console.log('Buscando associações para servicoId:', atividade.servicoId);
     
-    // Busca todas as associações de produtos vinculadas ao serviço
     const associacoes = await this.produtoServicoService.getAssociacoesByServicoId(atividade.servicoId);
     console.log('Associações encontradas:', associacoes);
     
-    // Verifica se há produtos associados ao serviço
     if (!associacoes || associacoes.length === 0) {
       await Swal.fire({ 
         icon: 'info', 
@@ -140,12 +128,10 @@ export class ListarAtividadesComponent implements OnInit {
       return;
     }
 
-    // Carrega os dados completos de cada produto associado
     const produtos = await Promise.all(
       associacoes.map(assoc => this.produtoService.getProdutoById(assoc.produtoId))
     );
     
-    // Verifica se todos os produtos possuem estoque suficiente
     const produtosSemEstoque = associacoes.filter((assoc, index) => {
       const produto = produtos[index];
       return !produto || produto.quantidade < assoc.quantidade;
@@ -161,17 +147,14 @@ export class ListarAtividadesComponent implements OnInit {
       return;
     }
 
-    // Aplica a baixa no estoque de cada produto
     await Promise.all(
       associacoes.map(async (assoc, index) => {
-        const produto = produtos[index]!; // Produto correspondente à associação
-        produto.quantidade -= assoc.quantidade; // Subtrai a quantidade usada
-        await this.produtoService.updateProduto(produto); // Atualiza no banco de dados
+        const produto = produtos[index]!;
+        produto.quantidade -= assoc.quantidade;
+        await this.produtoService.updateProduto(produto);
       })
     );
-    // O await é importante para garantir que todas as atualizações sejam concluídas antes de prosseguir
 
-    // Exibe mensagem de sucesso
     await Swal.fire({
       icon: 'success',
       title: 'Atividade concluída!',
@@ -180,7 +163,6 @@ export class ListarAtividadesComponent implements OnInit {
       showConfirmButton: false
     });
 
-    // Remove do conjunto de processamento e recarrega a lista
     this.processandoIds.delete(atividade.id);
     await this.carregarAtividades();
   }

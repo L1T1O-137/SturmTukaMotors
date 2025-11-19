@@ -21,7 +21,6 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
   produtosOriginal: Produto[] = [];
   produtosSelecionados: Produto[] = [];
   produtosSelecionadosIds: Set<number> = new Set<number>();
-  // Mapa para controlar quantidades associadas por produtoId
   quantidades: Map<number, number> = new Map<number, number>();
   servicoId!: number;
   produtoIdSelecionado!: number;
@@ -45,7 +44,6 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
     try {
       const associations = await this.produtoServicoService.getAssociacoesByServicoId(this.servicoId);
       this.produtosSelecionadosIds = new Set(associations.map(a => a.produtoId));
-      // Preenche o mapa de quantidades a partir das associações existentes
       associations.forEach(a => this.quantidades.set(a.produtoId, a.quantidade));
       const produtosPromises = Array.from(this.produtosSelecionadosIds).map(id => this.produtoService.getProdutoById(id));
       const encontrados = await Promise.all(produtosPromises);
@@ -91,7 +89,6 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
       produtoId: this.produtoIdSelecionado,
       quantidade: this.qtdeProduto
     };
-    // Atualiza quantidade local e persiste no IndexedDB
     this.quantidades.set(this.produtoIdSelecionado, this.qtdeProduto);
     this.produtoServicoService.updateProdutoServico(novaAssociacao).then(() => {
       console.log('Associação salva:', novaAssociacao);
@@ -121,7 +118,6 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
       const pid = produto.id;
       if (pid != null) {
         if (this.produtosSelecionadosIds.has(pid)) {
-          // Remover associação
           this.produtosSelecionadosIds.delete(pid);
           this.produtoIdSelecionado = pid;
           this.produtoServicoService.getAssociacoesById(this.servicoId, pid).then(() => {
@@ -129,7 +125,6 @@ export class AssociacaoProdutosServicoComponent implements OnInit {
           });
           this.quantidades.delete(pid);
         } else {
-          // Adicionar associação
           this.produtoIdSelecionado = pid;
           this.solicitarQuantidadeDoProduto();
         }

@@ -1,9 +1,9 @@
-<div class="container">
+﻿<div class="container">
   <div class="col-md-6 offset-md-3">
   <h1 class="text-center">{{ editMode ? 'Editar Produto' : 'Cadastrar Produto' }}</h1>
     <form [formGroup]="formProduto" (ngSubmit)="addProduto()" class="mb-5">
       
-      <!-- Nome do Produto -->
+      
       <div class="mb-3">
         <label for="nome" class="form-label">Nome do Produto:</label>
         <input 
@@ -22,7 +22,7 @@
         }
       </div>
 
-      <!-- Preço -->
+      
       <div class="mb-3">
         <label for="preco" class="form-label">Preço:</label>
         <input 
@@ -42,7 +42,7 @@
         }
       </div>
 
-      <!-- Quantidade -->
+      
       <div class="mb-3">
         <label for="quantidade" class="form-label">Quantidade:</label>
         <input 

@@ -11,7 +11,6 @@ import { ProdutoService } from '../../../services/produto.service';
 })
 export class ListarProdutosComponent implements OnInit {
   produtos: Produto[] = [];
-  // Eventos para o pai (Estoque) controlar edição e refresh externo
   @Output() editar = new EventEmitter<Produto>();
   @Output() removed = new EventEmitter<void>();
 
@@ -23,19 +22,16 @@ export class ListarProdutosComponent implements OnInit {
     this.getAllProdutos();
   }
 
-  /** Busca todos produtos */
   getAllProdutos() {
     this.produtoService.getAllProdutos().then(produtos => {
       this.produtos = produtos;
     });
   }
 
-  /** Dispara evento de edição para o pai abrir o formulário preenchido */
   onEditar(produto: Produto) {
     this.editar.emit(produto);
   }
 
-  /** Confirma e exclui um produto, recarregando a lista ao final */
   async onExcluir(produto: Produto) {
     const Swal = (await import('sweetalert2')).default;
     const confirm = await Swal.fire({
